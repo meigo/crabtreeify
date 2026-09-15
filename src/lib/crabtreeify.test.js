@@ -317,3 +317,43 @@ test("science and news words find their bodily sound-alikes", () => {
     "Keep a breast of the breast.",
   );
 });
+
+test("replacements double a final consonant and drop a final e like English", () => {
+  const layer = {
+    meta: { name: "spelling", label: "Spelling" },
+    wholeWords: {
+      know: "knob",
+      sheet: "shit",
+      mentor: "manure",
+      arch: "arse",
+      weigh: "wee",
+      willow: "willy",
+    },
+  };
+  const run = (text) => crabtreeify(text, [layer], { intensity: 1, enabledLayers: ["spelling"] });
+
+  assert.equal(run("knowing"), "knobbing");
+  assert.equal(run("sheeting"), "shitting");
+  assert.equal(run("mentoring"), "manuring");
+  assert.equal(run("mentored"), "manured");
+  assert.equal(run("arched"), "arsed");
+  assert.equal(run("weighed"), "weed");
+  assert.equal(run("weighing"), "weeing");
+  assert.equal(run("willows"), "willies");
+});
+
+test("doubled consonants in the input reach their base word", () => {
+  const layer = {
+    meta: { name: "doubled", label: "Doubled" },
+    wholeWords: { drop: "drip", chip: "chop", set: "shit", shut: "shat" },
+  };
+  const run = (text) => crabtreeify(text, [layer], { intensity: 1, enabledLayers: ["doubled"] });
+
+  assert.equal(run("dropped"), "dripped");
+  assert.equal(run("chipping"), "chopping");
+  // Three-letter stems stay out of reach, so "setting" is not "shitting".
+  assert.equal(run("setting"), "setting");
+  assert.equal(run("shutting"), "shatting");
+  // -er words are often words of their own: a shutter is not someone who shuts.
+  assert.equal(run("shutter"), "shutter");
+});

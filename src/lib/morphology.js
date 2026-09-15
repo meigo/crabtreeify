@@ -3,11 +3,25 @@
  * which base word an inflected form reaches.
  */
 
+/**
+ * "dropp" (from "dropped") -> "drop", for -ing and -ed only: a "shutter" is not someone who
+ * shuts. Stems must be long enough that "sett" (from "setting") does not reach "set", so short
+ * vulgar rules stay out of longer words.
+ */
+function undoubled(stem) {
+  return stem.length > 4 && /([^aeiou])\1$/.test(stem) ? stem.slice(0, -1) : null;
+}
+
 export function stemsOf(word) {
   const out = [];
+  const withUndoubled = (stem, suffix) => {
+    const shorter = undoubled(stem);
+    if (shorter) out.push({ stem: shorter, suffix });
+  };
   if (word.length > 6 && word.endsWith("ing")) {
     out.push({ stem: word.slice(0, -3), suffix: "ing" });
     out.push({ stem: `${word.slice(0, -3)}e`, suffix: "ing" });
+    withUndoubled(word.slice(0, -3), "ing");
   }
   if (word.length > 6 && word.endsWith("ly")) {
     out.push({ stem: word.slice(0, -2), suffix: "ly" });
@@ -31,21 +45,31 @@ export function stemsOf(word) {
   if (word.length > 5 && word.endsWith("ed")) {
     out.push({ stem: word.slice(0, -2), suffix: "ed" });
     out.push({ stem: `${word.slice(0, -2)}e`, suffix: "ed" });
+    withUndoubled(word.slice(0, -2), "ed");
   }
   return out;
 }
 
+/** Suffixes starting with a vowel, which can change the replacement's last letters. */
+const VOWEL_SUFFIXES = new Set(["ing", "ed", "er", "ers"]);
+
 /**
- * Glue a suffix onto a replacement the way English would, so "safety" ->
- * "sassiety" gives "sassieties" rather than "sassietyies".
+ * Glue a suffix onto a replacement the way English would: "sassiety" + ies is "sassieties",
+ * "knob" + ing is "knobbing", "manure" + ed is "manured" and "willy" + s is "willies".
  */
-export function inflect(to, suffix, stem) {
+export function inflect(to, suffix) {
   if (suffix === "ies") {
     return to.endsWith("y") ? `${to.slice(0, -1)}ies` : `${to}s`;
   }
-  if ((suffix === "ing" || suffix === "ed") && stem.endsWith("e") && to.endsWith("e")) {
-    return to.slice(0, -1) + suffix;
+  if (VOWEL_SUFFIXES.has(suffix)) {
+    if (to.endsWith("ee")) return suffix === "ing" ? `${to}ing` : to + suffix.slice(1);
+    if (to.endsWith("e")) return to.slice(0, -1) + suffix;
+    // A one-syllable ending of consonant, vowel, consonant doubles: "re-shit" -> "re-shitting".
+    const lastPart = to.split(/[- ]/).at(-1);
+    if (/^[^aeiouy]*[aeiou][^aeiouwxy]$/.test(lastPart)) return to + to.at(-1) + suffix;
+    return to + suffix;
   }
+  if (suffix === "s" && /[^aeiou]y$/.test(to)) return `${to.slice(0, -1)}ies`;
   const hisses = /(s|x|z|ch|sh)$/.test(to);
   if (suffix === "s" && hisses) return `${to}es`;
   if (suffix === "es" && !hisses) return `${to}s`;

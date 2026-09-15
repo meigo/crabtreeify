@@ -97,12 +97,12 @@ function lookupWholeWord(core, dict) {
 
   for (const { stem, suffix } of stemsOf(lower)) {
     if (dict[stem]) {
-      return { ...dict[stem], text: inflect(dict[stem].to, suffix, stem) };
+      return { ...dict[stem], text: inflect(dict[stem].to, suffix) };
     }
     for (const inner of stemsOf(stem)) {
       if (dict[inner.stem]) {
-        const base = inflect(dict[inner.stem].to, inner.suffix, inner.stem);
-        return { ...dict[inner.stem], text: inflect(base, suffix, inner.stem) };
+        const base = inflect(dict[inner.stem].to, inner.suffix);
+        return { ...dict[inner.stem], text: inflect(base, suffix) };
       }
     }
   }

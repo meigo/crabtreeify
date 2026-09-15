@@ -1,5 +1,5 @@
 import { normalizeLayer } from "../crabtreeify.js";
-import { stemsOf } from "../morphology.js";
+import { inflect, stemsOf } from "../morphology.js";
 import { targets } from "./targets.js";
 
 /**
@@ -91,7 +91,7 @@ export function findLonelyInflections(layers, isWord) {
       const baseTo = dict[base];
       if (baseTo === undefined) {
         lonely.push({ from, to, base, reason: "base form has no rule" });
-      } else if (to !== baseTo + suffix) {
+      } else if (to !== inflect(baseTo, suffix)) {
         lonely.push({ from, to, base, reason: `base maps to "${baseTo}"` });
       }
     }
