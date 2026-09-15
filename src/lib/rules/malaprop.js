@@ -208,7 +208,6 @@ export const core = {
     { from: "general intelligence", to: "genital inelegance", priority: 90 },
     { from: "machine superintelligence", to: "marine superinelegance", priority: 90 },
   ],
-  substrings: [],
 };
 
 export const extra = {
@@ -329,5 +328,4 @@ export const extra = {
     cant: "cunt",
   },
   phrases: [],
-  substrings: [],
 };

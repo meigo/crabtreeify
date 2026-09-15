@@ -38,4 +38,4 @@ Share links store settings in the URL hash so the text is not sent to a server. 
 
 ## Limits
 
-Phrase matches do not cross sentence-ending punctuation. Substring gags only fire at letter boundaries, so `chartreuse` is left alone. Accented words such as `René` are tokenized as whole words.
+Phrase matches do not cross sentence-ending punctuation. Rules match whole words and their simple inflections, so `chartreuse` is left alone. Accented words such as `René` are tokenized as whole words.

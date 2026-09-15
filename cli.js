@@ -1,13 +1,8 @@
 #!/usr/bin/env node
-import { crabtreeify, DEFAULT_INTENSITY } from "./src/lib/crabtreeify.js";
+import { crabtreeify } from "./src/lib/crabtreeify.js";
 import { layers, sampleText } from "./src/lib/rules/index.js";
 
 const text = process.argv.slice(2).join(" ") || sampleText;
-const intensity = Number(process.env.CHAOS ?? DEFAULT_INTENSITY);
 
-console.log(
-  crabtreeify(text, layers, {
-    intensity,
-    enabledLayers: layers.map((layer) => layer.meta.name),
-  }),
-);
+// The engine uses its default chaos when CHAOS is unset or not a number.
+console.log(crabtreeify(text, layers, { intensity: process.env.CHAOS }));

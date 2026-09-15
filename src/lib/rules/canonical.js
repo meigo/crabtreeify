@@ -11,7 +11,6 @@ export default {
     name: "canonical",
     label: "Original Crabtree",
     description: "Authentic show malapropisms — good moaning, pissing by the door, etc.",
-    alwaysApply: true,
     documented: true,
   },
 
@@ -167,8 +166,6 @@ export default {
     seal: "soil",
     fall: "fail",
   },
-
-  substrings: [],
 
   phrases: [
     { from: "good morning", to: "good moaning", priority: 400 },

@@ -1,12 +1,11 @@
 import { core as malapropCore, extra as malapropExtra } from "./malaprop.js";
 
-function group(minChaos, { wholeWords = {}, phrases = [], substrings = [] }) {
+function group(minChaos, { wholeWords = {}, phrases = [] }) {
   return {
     wholeWords: Object.fromEntries(
       Object.entries(wholeWords).map(([from, to]) => [from, { to, minChaos }]),
     ),
     phrases: phrases.map((p) => ({ ...p, minChaos })),
-    substrings: substrings.map((s) => ({ ...s, minChaos })),
   };
 }
 
@@ -52,8 +51,7 @@ const vulgar = group(0.8, {
 function mergeGroups(...groups) {
   const wholeWords = Object.assign({}, ...groups.map((g) => g.wholeWords));
   const phrases = groups.flatMap((g) => g.phrases);
-  const substrings = groups.flatMap((g) => g.substrings);
-  return { wholeWords, phrases, substrings };
+  return { wholeWords, phrases };
 }
 
 export default {

@@ -1,5 +1,5 @@
 import { inflect, stemsOf } from "./morphology.js";
-import { vowelSwap } from "./vowels.js";
+import { hashWord, vowelSwap } from "./vowels.js";
 
 export const DEFAULT_INTENSITY = 0.7;
 
@@ -35,21 +35,21 @@ function wordsOf(phrase) {
   return [...phrase.toLowerCase().matchAll(wordRegex())].map((match) => match[0]);
 }
 
-function phraseShape(text) {
-  const tokens = tokenize(text);
-  const wordIdxs = tokens
+function wordIndexes(tokens) {
+  return tokens
     .map((token, index) => (token.kind === "word" ? index : -1))
     .filter((index) => index >= 0);
+}
+
+function phraseShape(text) {
+  const tokens = tokenize(text);
+  const wordIdxs = wordIndexes(tokens);
 
   return {
     words: wordIdxs.map((index) => tokens[index].core.toLowerCase()),
-    separators: wordIdxs.slice(0, -1).map((index, position) => {
-      const next = wordIdxs[position + 1];
-      return tokens
-        .slice(index + 1, next)
-        .map(tokenText)
-        .join("");
-    }),
+    separators: wordIdxs
+      .slice(0, -1)
+      .map((index, position) => separatorBetween(tokens, index, wordIdxs[position + 1])),
   };
 }
 
@@ -63,42 +63,31 @@ function separatorsMatch(expected, actual) {
 
 /** Spread a yes/no decision evenly across words so chaos reads as density. */
 function passesDensity(intensity, seed) {
-  const level = Number(intensity);
-  if (level >= 1) return true;
-  if (level <= 0) return false;
-  let hash = 0;
-  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
-  return (hash % 100) / 100 < level;
+  if (intensity >= 1) return true;
+  if (intensity <= 0) return false;
+  return (hashWord(seed) % 100) / 100 < intensity;
 }
 
-function ruleApplies(intensity, minChaos, alwaysApply) {
-  if (alwaysApply) return true;
-  return Number(intensity) + 1e-9 >= (minChaos ?? 0);
+function ruleApplies(intensity, minChaos) {
+  return intensity + 1e-9 >= minChaos;
 }
 
-function asEntry(value, fallbackChaos = 0) {
+function asEntry(value) {
   if (value && typeof value === "object" && "to" in value) {
-    return { to: value.to, minChaos: value.minChaos ?? fallbackChaos };
+    return { to: value.to, minChaos: value.minChaos ?? 0 };
   }
-  return { to: value, minChaos: fallbackChaos };
+  return { to: value, minChaos: 0 };
 }
 
 function sortPhrases(phrases) {
   return [...phrases].sort((a, b) => {
-    const wa = wordsOf(a.from).length;
-    const wb = wordsOf(b.from).length;
+    const wa = a.shape.words.length;
+    const wb = b.shape.words.length;
     if (wb !== wa) return wb - wa;
     const pa = a.priority ?? 0;
     const pb = b.priority ?? 0;
     if (pb !== pa) return pb - pa;
     return b.from.length - a.from.length;
-  });
-}
-
-function sortSubstrings(rules) {
-  return [...rules].sort((a, b) => {
-    if (b.from.length !== a.from.length) return b.from.length - a.from.length;
-    return (b.priority ?? 0) - (a.priority ?? 0);
   });
 }
 
@@ -129,14 +118,7 @@ function tokenize(text) {
     if (index > cursor) {
       tokens.push({ kind: "sep", raw: text.slice(cursor, index) });
     }
-    tokens.push({
-      kind: "word",
-      lead: "",
-      core: match[0],
-      originalCore: match[0],
-      trail: "",
-      locked: false,
-    });
+    tokens.push({ kind: "word", core: match[0], originalCore: match[0], locked: false });
     cursor = index + match[0].length;
   }
 
@@ -147,7 +129,7 @@ function tokenize(text) {
 }
 
 function tokenText(token) {
-  return token.kind === "sep" ? token.raw : `${token.lead}${token.core}${token.trail}`;
+  return token.kind === "sep" ? token.raw : token.core;
 }
 
 function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
@@ -186,19 +168,18 @@ function separatorBetween(tokens, leftIndex, rightIndex) {
     .join("");
 }
 
-function applyPhrases(tokens, phrases, intensity, alwaysApply) {
-  const wordIdxs = tokens.map((t, i) => (t.kind === "word" ? i : -1)).filter((i) => i >= 0);
-  const used = new Set();
+function applyPhrases(tokens, phrases, intensity) {
+  const wordIdxs = wordIndexes(tokens);
 
   for (const phrase of phrases) {
-    if (!ruleApplies(intensity, phrase.minChaos, alwaysApply)) continue;
+    if (!ruleApplies(intensity, phrase.minChaos)) continue;
     const fromWords = phrase.shape.words;
-    const toWords = wordsOf(phrase.to);
     if (!fromWords.length) continue;
 
     for (let start = 0; start <= wordIdxs.length - fromWords.length; start += 1) {
       const span = wordIdxs.slice(start, start + fromWords.length);
-      if (span.some((i) => used.has(i) || tokens[i].locked)) continue;
+      // A matched phrase locks its whole span, so this also stops phrases overlapping.
+      if (span.some((i) => tokens[i].locked)) continue;
       const matched = span.every((i, n) => tokens[i].core.toLowerCase() === fromWords[n]);
       if (!matched) continue;
       const separatorsMatched = span.slice(0, -1).every((tokenIndex, position) => {
@@ -206,34 +187,19 @@ function applyPhrases(tokens, phrases, intensity, alwaysApply) {
         return separatorsMatch(phrase.shape.separators[position], actual);
       });
       if (!separatorsMatched) continue;
-      applyPhraseAt(tokens, span, fromWords, toWords);
-      span.forEach((i) => used.add(i));
+      applyPhraseAt(tokens, span, fromWords, phrase.toWords);
     }
   }
 }
 
-function applyWholeWords(tokens, dict, intensity, alwaysApply) {
+function applyWholeWords(tokens, dict, intensity) {
   for (const token of tokens) {
     if (token.kind !== "word" || token.locked) continue;
     const hit = lookupWholeWord(token.core, dict);
     if (!hit) continue;
-    if (!ruleApplies(intensity, hit.minChaos, alwaysApply)) continue;
+    if (!ruleApplies(intensity, hit.minChaos)) continue;
     token.core = preserveCase(token.core, hit.text);
     token.locked = true;
-  }
-}
-
-function applySubstrings(tokens, rules, intensity, alwaysApply) {
-  for (const token of tokens) {
-    if (token.kind !== "word" || token.locked) continue;
-    for (const rule of rules) {
-      if (rule.from.length < 4) continue;
-      if (!ruleApplies(intensity, rule.minChaos, alwaysApply)) continue;
-      if (token.core.toLowerCase() !== rule.from.toLowerCase()) continue;
-      token.core = preserveCase(token.core, rule.to);
-      token.locked = true;
-      break;
-    }
   }
 }
 
@@ -250,7 +216,7 @@ function applyGenerative(tokens, intensity) {
     if (token.kind !== "word" || token.locked) return;
     // Names read as typos when mangled, so save them for maximum chaos.
     const isName = /^[A-Z]/.test(token.originalCore) && !isSentenceStart(tokens, index);
-    if (isName && Number(intensity) < 1) return;
+    if (isName && intensity < 1) return;
     if (!passesDensity(intensity, `${token.core}:${index}`)) return;
     const swapped = vowelSwap(token.core);
     if (!swapped) return;
@@ -260,25 +226,18 @@ function applyGenerative(tokens, intensity) {
 }
 
 export function normalizeLayer(layer) {
-  const fallback = layer.meta?.alwaysApply || layer.alwaysApply ? 0 : (layer.minChaos ?? 0);
   // No prototype, so input words like "constructor" can't find Object.prototype members.
   const wholeWords = Object.create(null);
   for (const [from, value] of Object.entries(layer.wholeWords ?? {})) {
-    wholeWords[from.toLowerCase()] = asEntry(value, fallback);
+    wholeWords[from.toLowerCase()] = asEntry(value);
   }
 
   const phrases = sortPhrases(
     (layer.phrases ?? []).map((phrase) => ({
       ...phrase,
       shape: phraseShape(phrase.from),
-      minChaos: phrase.minChaos ?? fallback,
-    })),
-  );
-
-  const substrings = sortSubstrings(
-    (layer.substrings ?? []).map((s) => ({
-      ...s,
-      minChaos: s.minChaos ?? fallback,
+      toWords: wordsOf(phrase.to),
+      minChaos: phrase.minChaos ?? 0,
     })),
   );
 
@@ -286,8 +245,6 @@ export function normalizeLayer(layer) {
     meta: layer.meta ?? { name: "layer", label: "Layer" },
     wholeWords,
     phrases,
-    substrings,
-    alwaysApply: layer.alwaysApply ?? layer.meta?.alwaysApply ?? false,
     generative: layer.generative ?? false,
   };
 }
@@ -297,9 +254,8 @@ function applyLayer(tokens, layer, intensity) {
     applyGenerative(tokens, intensity);
     return;
   }
-  applyPhrases(tokens, layer.phrases, intensity, layer.alwaysApply);
-  applyWholeWords(tokens, layer.wholeWords, intensity, layer.alwaysApply);
-  applySubstrings(tokens, layer.substrings, intensity, layer.alwaysApply);
+  applyPhrases(tokens, layer.phrases, intensity);
+  applyWholeWords(tokens, layer.wholeWords, intensity);
 }
 
 function toParts(tokens) {
@@ -307,7 +263,7 @@ function toParts(tokens) {
     const text = tokenText(token);
     if (token.kind === "sep") return { text, changed: false, from: text };
     const changed = token.core.toLowerCase() !== token.originalCore.toLowerCase();
-    return { text, changed, from: `${token.lead}${token.originalCore}${token.trail}` };
+    return { text, changed, from: token.originalCore };
   });
 }
 

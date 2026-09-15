@@ -81,7 +81,3 @@ const seeds = [
 ];
 
 export const targets = new Set(seeds);
-
-export function isTarget(word) {
-  return targets.has(word.toLowerCase());
-}

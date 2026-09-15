@@ -37,13 +37,14 @@ function isPronounceable(word) {
 }
 
 function canonicalVowel(group) {
+  // Groups come from VOWEL_GROUPS, so they only ever hold a, e, i, o, u and y.
   const g = group.toLowerCase();
   if (VOWEL_LINE.includes(g)) return g;
-  if (g === "y" || g === "ie" || g.startsWith("i")) return "i";
+  if (g === "y" || g.startsWith("i")) return "i";
   if (g === "ea" || g === "ei" || g.startsWith("ee")) return "ee";
-  if (g === "ai" || g === "ay" || g === "au" || g.startsWith("a")) return "a";
-  if (g === "oo" || g.startsWith("oo") || g === "ou" || g === "ew" || g === "ue") return "oo";
-  if (g === "oa" || g === "ow" || g.startsWith("o")) return "o";
+  if (g.startsWith("a")) return "a";
+  if (g.startsWith("oo") || g === "ou" || g === "ue") return "oo";
+  if (g.startsWith("o")) return "o";
   if (g.startsWith("u")) return "u";
   if (g.startsWith("e")) return "e";
   return "o";
@@ -60,7 +61,7 @@ function nearness(fromGroup, toVowel) {
   return 0;
 }
 
-function hashWord(word) {
+export function hashWord(word) {
   let hash = 0;
   for (const ch of word) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
   return hash;

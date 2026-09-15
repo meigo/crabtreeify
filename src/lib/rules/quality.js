@@ -87,7 +87,6 @@ export function findLonelyInflections(layers, isWord) {
     const to = dict[from];
     for (const { stem: base, suffix } of stemsOf(from)) {
       if (base.length < 3 || !isWord(base)) continue;
-      if (from !== base + suffix && !from.endsWith(suffix)) continue;
 
       const baseTo = dict[base];
       if (baseTo === undefined) {
@@ -111,12 +110,8 @@ export function findWeakPairs(layers) {
     for (const [from, entry] of Object.entries(normalized.wholeWords)) {
       if (isWeakPair(from, entry.to)) weak.push({ layer: name, from, to: entry.to });
     }
-    for (const list of [normalized.phrases, normalized.substrings]) {
-      for (const rule of list) {
-        if (isWeakPair(rule.from, rule.to)) {
-          weak.push({ layer: name, from: rule.from, to: rule.to });
-        }
-      }
+    for (const rule of normalized.phrases) {
+      if (isWeakPair(rule.from, rule.to)) weak.push({ layer: name, from: rule.from, to: rule.to });
     }
   }
   return weak;
