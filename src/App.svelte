@@ -1,8 +1,14 @@
 <script>
   import { crabtreeifyDetailed } from "./lib/crabtreeify.js";
-  import { layers, sampleText } from "./lib/rules/index.js";
+  import { layers, sampleText, canonicalQuotes } from "./lib/rules/index.js";
+  import {
+    SHARE_TEXT_LIMIT,
+    parseShareParams,
+    buildShareParams,
+    buildSharePath,
+  } from "./lib/share.js";
 
-  const params = new URLSearchParams(window.location.search);
+  const params = parseShareParams(window.location.search, window.location.hash);
   const layerList = layers.map((layer) => ({
     name: layer.meta.name,
     label: layer.meta.label,
@@ -10,7 +16,7 @@
   }));
 
   const chaosPresets = [
-    { label: "Show only", value: 0 },
+    { label: "Canonical", value: 0 },
     { label: "Officer", value: 0.5 },
     { label: "Bonkers", value: 1 },
   ];
@@ -21,6 +27,7 @@
   let copied = $state(false);
   let shared = $state(false);
   let status = $state("");
+  let statusTimer;
 
   function enabledNames() {
     return layerList.map((l) => l.name).filter((name) => enabledLayers[name]);
@@ -31,8 +38,10 @@
   );
 
   let chaosName = $derived(
-    intensity < 0.2 ? "Show only" : intensity < 0.9 ? "Officer" : "Bonkers",
+    intensity < 0.2 ? "Canonical" : intensity < 0.9 ? "Officer" : "Bonkers",
   );
+
+  let shareTooLong = $derived(input.length > SHARE_TEXT_LIMIT);
 
   function clampChaos(value) {
     const n = Number(value);
@@ -47,61 +56,73 @@
   }
 
   function shareUrl() {
-    const next = new URLSearchParams();
-    next.set("text", input);
-    next.set("chaos", String(intensity));
-    next.set("layers", enabledNames().join(","));
-    return `${window.location.pathname}?${next.toString()}`;
+    const next = buildShareParams({
+      text: input,
+      chaos: intensity,
+      layers: enabledNames(),
+    });
+    return buildSharePath(window.location.pathname, next);
   }
 
   function loadSample() {
     input = sampleText;
   }
 
-  async function writeClipboard(text, successMessage, failureMessage) {
-    status = "";
+  function loadQuote(event) {
+    const index = Number(event.currentTarget.value);
+    if (Number.isNaN(index) || index < 0) return;
+    input = canonicalQuotes[index].source;
+    event.currentTarget.value = "";
+  }
+
+  function announce(message) {
+    status = message;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(() => {
+      status = "";
+      copied = false;
+      shared = false;
+    }, 1600);
+  }
+
+  async function copyValue(value, okMessage) {
     try {
       if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
-      await navigator.clipboard.writeText(text);
-      status = successMessage;
+      await navigator.clipboard.writeText(value);
+      announce(okMessage);
       return true;
     } catch {
-      status = failureMessage;
+      announce("Copy failed. Select the output and copy it manually.");
       return false;
     }
   }
 
   async function copyOutput() {
-    copied = await writeClipboard(
-      result.text,
-      "Output copied.",
-      "Copy failed. Select the output and copy it manually.",
-    );
-    if (copied) {
-      setTimeout(() => {
-        copied = false;
-      }, 1200);
-    }
+    copied = await copyValue(result.text, "Output copied.");
   }
 
   async function copyShareLink() {
-    const url = new URL(shareUrl(), window.location.origin).toString();
-    await navigator.clipboard.writeText(url);
-    history.replaceState(null, "", shareUrl());
+    const path = shareUrl();
+    const url = new URL(path, window.location.origin).toString();
+    const ok = await copyValue(
+      url,
+      shareTooLong ? "Link copied without the text — it was too long to share." : "Share link copied.",
+    );
+    if (!ok) return;
+    history.replaceState(null, "", path);
     shared = true;
-    setTimeout(() => {
-      shared = false;
-    }, 1200);
   }
 </script>
 
-<main class="mx-auto max-w-2xl px-5 py-14">
+<main class="mx-auto max-w-2xl px-5 py-8 sm:py-14">
   <header class="mb-10">
     <h1 class="m-0 text-2xl font-medium tracking-tight">Crabtreeify</h1>
     <p class="mt-1 text-sm text-muted">
       Plain English into Officer Crabtree nonsense. Structure preserved, dignity optional.
     </p>
   </header>
+
+  <p class="sr-only" role="status" aria-live="polite">{#if status}{status}{/if}</p>
 
   <section class="mb-8">
     <label for="input" class="mb-2 block text-xs uppercase tracking-wider text-muted">
@@ -113,8 +134,15 @@
       bind:value={input}
       placeholder="Type or paste something sensible..."
     ></textarea>
-    <div class="mt-2">
+    <div class="mt-2 flex flex-wrap gap-2">
       <button type="button" onclick={loadSample}>Load sample</button>
+      <label class="sr-only" for="quote">Load a show quote</label>
+      <select id="quote" onchange={loadQuote}>
+        <option value="">Load a show quote…</option>
+        {#each canonicalQuotes as quote, index}
+          <option value={index}>{quote.note}</option>
+        {/each}
+      </select>
     </div>
   </section>
 
@@ -130,10 +158,14 @@
       max="1"
       step="0.05"
       value={intensity}
+      aria-valuetext="{chaosName} ({intensity.toFixed(2)})"
       oninput={(e) => {
         intensity = Number(e.currentTarget.value);
       }}
     />
+    <p class="mt-2 text-xs text-muted">
+      Canonical keeps the original malapropisms. Officer adds common gags. Bonkers mangles the rest.
+    </p>
     <div class="mt-3 flex flex-wrap gap-2">
       {#each chaosPresets as preset}
         <button
@@ -148,23 +180,28 @@
   </section>
 
   <section class="mb-8">
-    <p class="mb-2 text-xs uppercase tracking-wider text-muted">Layers</p>
-    <div class="flex flex-col gap-2">
-      {#each layerList as layer}
-        <label class="flex cursor-pointer items-baseline gap-2.5 text-sm">
-          <input type="checkbox" bind:checked={enabledLayers[layer.name]} />
-          <span>
-            {layer.label}
-            <span class="text-muted"> — {layer.description}</span>
-          </span>
-        </label>
-      {/each}
-    </div>
+    <fieldset class="m-0 border-0 p-0">
+      <legend class="mb-2 px-0 text-xs uppercase tracking-wider text-muted">Layers</legend>
+      <div class="flex flex-col gap-2">
+        {#each layerList as layer}
+          <label class="flex cursor-pointer items-baseline gap-2.5 text-sm">
+            <input type="checkbox" bind:checked={enabledLayers[layer.name]} />
+            <span>
+              {layer.label}
+              <span class="text-muted"> — {layer.description}</span>
+            </span>
+          </label>
+        {/each}
+      </div>
+    </fieldset>
+    {#if enabledNames().length === 0}
+      <p class="mt-2 text-xs text-muted">Enable at least one layer to crabtreeify the text.</p>
+    {/if}
   </section>
 
   <section>
-    <div class="mb-2 flex items-baseline justify-between gap-3">
-      <p class="text-xs uppercase tracking-wider text-muted">
+    <div class="mb-2 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+      <p id="output-label" class="text-xs uppercase tracking-wider text-muted">
         Crabtree
         {#if result.changeCount}
           · {result.changeCount} changed
@@ -175,11 +212,16 @@
         <button type="button" onclick={copyOutput}>{copied ? "Copied" : "Copy"}</button>
       </div>
     </div>
-    <div class="output">
+    <div class="output" aria-labelledby="output-label">
       {#if result.text}
-        {#each result.parts as part}
+        {#each result.parts as part, i (i)}
           {#if part.changed}
-            <mark title="{part.from} → {part.text}">{part.text}</mark>
+            <button
+              type="button"
+              class="change"
+              title="{part.from} → {part.text}"
+              aria-label="Changed from {part.from} to {part.text}"
+            >{part.text}</button>
           {:else}
             {part.text}
           {/if}
@@ -188,9 +230,8 @@
         <span class="text-muted">Good moaning...</span>
       {/if}
     </div>
-    <p class="sr-only" role="status" aria-live="polite">{#if status}{status}{/if}</p>
     {#if result.changeCount}
-      <p class="mt-2 text-xs text-muted">Hover a highlighted word to see the original.</p>
+      <p class="mt-2 text-xs text-muted">Focus or hover a highlighted word to see the original.</p>
     {/if}
   </section>
 </main>

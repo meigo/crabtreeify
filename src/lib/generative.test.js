@@ -37,6 +37,10 @@ test("curated swaps still win over generative mangling", () => {
   assert.match(text, /pissing/i);
 });
 
+test("canonical phrases stay intact at maximum chaos", () => {
+  assert.equal(run("Good morning.", 1).text, "Good moaning.");
+});
+
 test("leaves mid-sentence proper nouns alone until maximum chaos", () => {
   const text = "The report from Anthropic was late.";
   assert.match(run(text, 0.7).text, /Anthropic/);

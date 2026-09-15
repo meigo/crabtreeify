@@ -30,17 +30,10 @@ const star = group(0.15, {
     { from: "context menu", to: "cocktext menu", priority: 80 },
     { from: "compute shader", to: "com-poop shader", priority: 80 },
   ],
-  substrings: [
-    { from: "password", to: "pissward", priority: 100 },
-    { from: "context", to: "cocktext", priority: 100 },
-    { from: "computer", to: "com-pooter", priority: 100 },
-    { from: "compute", to: "com-poop", priority: 95 },
-    { from: "chart", to: "fart", priority: 90 },
-  ],
 });
 
 const prose = group(0.15, malapropCore);
-const proseExtra = group(0.55, malapropExtra);
+const proseExtra = group(0.45, malapropExtra);
 
 const vulgar = group(0.8, {
   wholeWords: {

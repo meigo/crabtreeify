@@ -1,0 +1,36 @@
+# Crabtreeify
+
+Turn plain English into Officer Crabtree nonsense from *'Allo 'Allo!*. Canonical show malapropisms stay in place; optional layers add later gags and vowel mangling.
+
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Local web UI |
+| `npm test` | Engine tests, then UI tests |
+| `npm run eval` | Coverage / jackpot / untouched-word report |
+| `npm run build` | Production static site in `dist/` |
+| `npm run cli -- "Good morning."` | Print a transformation |
+
+Chaos is a 0–1 density. `0` keeps original Crabtree lines. Higher values add silly substitutions, then generative vowel swaps. The CLI uses the engine default (`0.7`) unless you set `CHAOS`.
+
+```bash
+CHAOS=1 npm run cli -- "Good morning."
+```
+
+## Layers
+
+- **Original Crabtree** — documented show swaps (`good morning` → `good moaning`)
+- **Silly substitutions** — extra malapropisms gated by chaos
+- **Vowel mangling** — fills leftover words without overriding curated jokes
+
+Share links store settings in the URL hash so the text is not sent to a server. Very long input is omitted from the link.
+
+## Limits
+
+Phrase matches do not cross sentence-ending punctuation. Substring gags only fire at letter boundaries, so `chartreuse` is left alone. Accented words such as `René` are tokenized as whole words.

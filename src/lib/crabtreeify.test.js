@@ -152,6 +152,36 @@ test("news prose gets Crabtree swaps", () => {
   assert.ok(changeCount >= 8, `expected many swaps, got ${changeCount}: ${out}`);
 });
 
+test("essay prose gets silly malapropisms without vowel mangling", () => {
+  const text =
+    "The human brain has some capabilities that the brains of other animals lack. It is to these distinctive capabilities that our species owes its dominant position. If machine brains surpassed human brains in general intelligence, then this new superintelligence could become extremely powerful - possibly beyond our control. As the fate of the gorillas now depends more on humans than on the species itself, so would the fate of humankind depend on the actions of the machine superintelligence.";
+  const { text: out, changeCount } = crabtreeifyDetailed(text, layers, {
+    intensity: 0.35,
+    enabledLayers: ["silly"],
+  });
+  assert.match(out, /hymen/i);
+  assert.match(out, /brawn/i);
+  assert.match(out, /culpabilit/i);
+  assert.match(out, /otter/i);
+  assert.match(out, /genital/i);
+  assert.match(out, /inelegance/i);
+  assert.match(out, /guerrilla/i);
+  assert.match(out, /auction/i);
+  assert.ok(changeCount >= 12, `expected many silly swaps, got ${changeCount}: ${out}`);
+});
+
+test("company-memo words fall onto vulgar punchlines", () => {
+  const out = convert(
+    "The bigger batch will ship after a mature review of the suit.",
+    0.35,
+    ["silly"],
+  );
+  assert.match(out, /bugger/i);
+  assert.match(out, /bitch/i);
+  assert.match(out, /shit/i);
+  assert.match(out, /manure/i);
+});
+
 test("suffixes are spelled correctly on the replacement", () => {
   // safety -> sassiety, so the plural must be sassieties, not sassietyies.
   assert.equal(convert("safeties", 1), "sassieties");
@@ -164,6 +194,21 @@ test("singular and plural stay in step", () => {
   assert.equal(convert("days", 1), "dies");
   assert.equal(convert("egg", 1), "ogg");
   assert.equal(convert("eggs", 1), "oggs");
+});
+
+test("phrases do not match across sentence punctuation", () => {
+  const out = convert("mother. in law", 0, ["canonical"]);
+  assert.doesNotMatch(out, /loo/i);
+});
+
+test("accented whole words still match", () => {
+  assert.match(convert("Do not worry René", 0, ["canonical"]), /ronnie/i);
+});
+
+test("substring rules do not rewrite unrelated longer words", () => {
+  const out = convert("chartreuse and contextual notes", 1, ["silly"]);
+  assert.doesNotMatch(out, /fartreuse/i);
+  assert.doesNotMatch(out, /cocktextual/i);
 });
 
 test("detailed output marks changed words", () => {

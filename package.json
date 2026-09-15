@@ -11,7 +11,9 @@
     "test": "npm run test:engine && npm run test:ui",
     "test:engine": "node --test 'src/**/*.test.js'",
     "test:ui": "vitest run --config vitest.config.js",
-    "eval": "node scripts/eval.js"
+    "eval": "node scripts/eval.js",
+    "suggest": "node scripts/suggest.js",
+    "check": "npm test && npm run build"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.3",

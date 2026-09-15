@@ -1,4 +1,5 @@
 import { targets } from "./rules/targets.js";
+import { STOPWORDS } from "./stopwords.js";
 
 /**
  * Generative half of the joke. Officer Crabtree's actual device was vowel
@@ -19,21 +20,15 @@ const RHOTIC = [
   ["ur", "u"],
 ];
 
-/** Grammatical glue he leaves intact. */
-const STOPWORDS = new Set([
-  "the", "a", "an", "and", "or", "but", "if", "so", "as", "of", "to", "in",
-  "on", "at", "by", "for", "from", "with", "that", "this", "these", "those",
-  "is", "are", "was", "were", "be", "been", "being", "am",
-  "has", "have", "had", "do", "does", "did", "will", "would", "shall",
-  "should", "can", "could", "may", "might", "must",
-  "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us",
-  "them", "my", "your", "his", "its", "our", "their", "who", "whom",
-  "no", "not", "yes", "than", "then", "there", "here", "what", "which",
-  "all", "any", "some", "more", "most", "such", "each", "both", "too",
-]);
-
 const VOWEL_GROUPS = /[aeiouy]+/g;
 const HAS_VOWEL = /[aeiouy]/;
+
+/**
+ * Front-to-back line used for neighbour weighting. Adjacent steps are the
+ * swaps that still sound like the same word with a bad accent; distant
+ * jumps (o → ee) read as a different language.
+ */
+const VOWEL_LINE = ["ee", "i", "e", "a", "o", "oo", "u"];
 
 function isPronounceable(word) {
   if (/(.)\1\1/.test(word)) return false;
@@ -41,24 +36,73 @@ function isPronounceable(word) {
   return true;
 }
 
+function canonicalVowel(group) {
+  const g = group.toLowerCase();
+  if (VOWEL_LINE.includes(g)) return g;
+  if (g === "y" || g === "ie" || g.startsWith("i")) return "i";
+  if (g === "ea" || g === "ei" || g.startsWith("ee")) return "ee";
+  if (g === "ai" || g === "ay" || g === "au" || g.startsWith("a")) return "a";
+  if (g === "oo" || g.startsWith("oo") || g === "ou" || g === "ew" || g === "ue") return "oo";
+  if (g === "oa" || g === "ow" || g.startsWith("o")) return "o";
+  if (g.startsWith("u")) return "u";
+  if (g.startsWith("e")) return "e";
+  return "o";
+}
+
+function nearness(fromGroup, toVowel) {
+  const from = VOWEL_LINE.indexOf(canonicalVowel(fromGroup));
+  const to = VOWEL_LINE.indexOf(toVowel);
+  if (from < 0 || to < 0) return 0;
+  const distance = Math.abs(from - to);
+  if (distance === 1) return 4;
+  if (distance === 2) return 2;
+  if (distance === 3) return 1;
+  return 0;
+}
+
+function hashWord(word) {
+  let hash = 0;
+  for (const ch of word) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
+  return hash;
+}
+
+function biasBag(sourceGroup) {
+  const bag = [];
+  for (const vowel of PALETTE) {
+    let weight = 1 + nearness(sourceGroup, vowel);
+    if (vowel === "o") weight += 2;
+    if (vowel === "oo") weight += 1;
+    for (let i = 0; i < weight; i += 1) bag.push(vowel);
+  }
+  return bag;
+}
+
+function paletteFor(word, groups) {
+  // Short words keep the classic o-led punches ("fosh and chops"). Longer
+  // words pick a preferred vowel from neighbours of the stressed group.
+  if (groups.length <= 1) return PALETTE;
+  const bag = biasBag(groups[0][0]);
+  const preferred = bag[hashWord(word) % bag.length];
+  return [preferred, ...PALETTE.filter((vowel) => vowel !== preferred)];
+}
+
 function candidatesFor(word) {
   const out = [];
 
   // Swap one vowel group at a time; earlier groups carry the stress.
   const groups = [...word.matchAll(VOWEL_GROUPS)];
+  const palette = paletteFor(word, groups);
   groups.forEach((group, groupIndex) => {
-    PALETTE.forEach((vowel, paletteIndex) => {
+    palette.forEach((vowel, paletteIndex) => {
       if (vowel === group[0]) return;
       const candidate =
         word.slice(0, group.index) + vowel + word.slice(group.index + group[0].length);
+      const stretch = Math.abs(candidate.length - word.length);
+      const near = stretch === 0 ? nearness(group[0], vowel) : 0;
       out.push({
         candidate,
-        // Earlier groups carry the stress; shrinking a word reads as a typo.
-        score:
-          PALETTE.length -
-          paletteIndex -
-          groupIndex -
-          3 * Math.max(0, word.length - candidate.length),
+        // Earlier groups carry the stress; changing length reads as a typo.
+        score: palette.length - paletteIndex - groupIndex - 3 * stretch + near,
       });
     });
   });

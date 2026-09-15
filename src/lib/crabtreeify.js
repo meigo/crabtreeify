@@ -1,6 +1,6 @@
 import { vowelSwap } from "./vowels.js";
 
-const DEFAULT_INTENSITY = 0.7;
+export const DEFAULT_INTENSITY = 0.7;
 
 function normalizeIntensity(value) {
   const numeric = Number(value ?? DEFAULT_INTENSITY);
@@ -36,7 +36,8 @@ function wordsOf(phrase) {
 
 function phraseShape(text) {
   const tokens = tokenize(text);
-  const wordIdxs = tokens.map((token, index) => (token.kind === "word" ? index : -1))
+  const wordIdxs = tokens
+    .map((token, index) => (token.kind === "word" ? index : -1))
     .filter((index) => index >= 0);
 
   return {
@@ -198,9 +199,8 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
   const n = Math.min(fromWords.length, toWords.length);
 
   for (let i = 0; i < n; i += 1) {
-    const next = preserveCase(fromCores[i], toWords[i]);
     const token = tokens[wordIdxs[i]];
-    token.core = next;
+    token.core = preserveCase(fromCores[i], toWords[i]);
     token.locked = true;
   }
 
@@ -266,8 +266,7 @@ function applySubstrings(tokens, rules, intensity, alwaysApply) {
     for (const rule of rules) {
       if (rule.from.length < 4) continue;
       if (!ruleApplies(intensity, rule.minChaos, alwaysApply)) continue;
-      const matchesWholeToken = token.core.toLowerCase() === rule.from.toLowerCase();
-      if (!matchesWholeToken) continue;
+      if (token.core.toLowerCase() !== rule.from.toLowerCase()) continue;
       token.core = preserveCase(token.core, rule.to);
       token.locked = true;
       break;
@@ -348,13 +347,24 @@ function toParts(tokens) {
   });
 }
 
+const compiledLayers = new WeakMap();
+
+function compiled(layers) {
+  let normalized = compiledLayers.get(layers);
+  if (!normalized) {
+    normalized = layers.map(normalizeLayer);
+    compiledLayers.set(layers, normalized);
+  }
+  return normalized;
+}
+
 export function crabtreeifyDetailed(text, layers, options = {}) {
   const intensity = normalizeIntensity(options.intensity);
   const enabledNames = options.enabledLayers;
   const source = text ?? "";
   const tokens = tokenize(source);
 
-  const normalized = layers.map(normalizeLayer).filter((layer) => {
+  const normalized = compiled(layers).filter((layer) => {
     if (!enabledNames) return true;
     return enabledNames.includes(layer.meta.name);
   });
