@@ -89,6 +89,14 @@ const seeds = [
   "strumpets", "thong", "thongs", "tosspot", "tosspots", "tummy", "tummies", "tush", "twat",
   "vomit", "wally", "wallies", "wiener", "wieners",
 
+  // second pass: related-word hits that had been left on the table
+  "backside", "backsides", "barf", "barfs", "berk", "berks", "bunghole", "bungholes",
+  "burp", "burps", "cack", "clit", "clits", "derriere", "derrieres", "dildo", "dildos",
+  "doody", "douche", "douches", "dump", "dumps", "filth", "honker", "honkers",
+  "keister", "keisters", "merkin", "merkins", "minge", "minges", "nob", "nobs",
+  "pee", "pees", "ponce", "ponces", "puke", "pukes", "putz", "putzes", "skank", "skanks",
+  "spooge", "wang", "wangs",
+
   // words worth exposing with a well-placed hyphen
   "suck", "sucks", "sucking", "meat", "meats", "bass", "dick", "dicks",
   "tickle", "tickles", "mint", "mints", "once",

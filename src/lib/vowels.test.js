@@ -47,7 +47,7 @@ test("leaves short words alone so swaps don't read as typos", () => {
 });
 
 test("mangles a short word only when it hits a jackpot", () => {
-  assert.equal(vowelSwap("pie"), "poo");
+  assert.equal(vowelSwap("pie"), "pee");
 });
 
 test("prefers not to shrink the word", () => {

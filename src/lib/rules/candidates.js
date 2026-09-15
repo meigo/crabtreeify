@@ -11,18 +11,20 @@ const LETTERS = "abcdefghijklmnopqrstuvwxyz";
 /** Punchlines you would not put in a company memo. */
 // prettier-ignore
 export const companyPunchlines = [
-  "anal", "anus", "arse", "balls", "bastard", "bitch", "bloody", "bollocks", "bonce",
-  "boner", "bonk", "boob", "boobs", "booby", "booger", "bosom", "bottom", "bowel",
-  "breast", "bugger", "bum", "butt", "cock", "colon", "crap", "crapper", "crotch",
-  "cunt", "dick", "dong", "dork", "dribble", "drool", "dung", "enema",
-  "erection", "fanny", "fart", "floozy", "fondle", "gob", "gonad", "groin", "grope",
-  "heinie", "hiccup", "hooter", "horny", "hump", "impotent", "knicker", "knob",
-  "knocker", "loin", "loo", "manky", "manure", "minging", "moan", "nad", "nappy",
-  "nipple", "numpty", "orgasm", "pecker", "penis", "perv", "phallus", "piddle",
-  "pillock", "pimple", "piss", "pong", "poo", "poop", "potty", "prick", "pube", "pubic",
-  "randy", "semen", "sewage", "shag", "shat", "shit", "shite", "slobber", "snog",
-  "snot", "strumpet", "suck", "thong", "tit", "tits", "tosspot", "tummy", "turd",
-  "tush", "twat", "vomit", "wally", "wank", "wee", "whore", "wiener", "willy",
+  "anal", "anus", "arse", "balls", "barf", "bastard", "berk", "bitch", "bloody", "bollocks",
+  "bonce", "boner", "bonk", "boob", "boobs", "booby", "booger", "bosom", "bottom", "bowel",
+  "breast", "bugger", "bum", "bunghole", "burp", "butt", "cack", "clit", "cock", "colon",
+  "crap", "crapper", "crotch", "cunt", "dick", "dildo", "dong", "doody", "dork", "douche",
+  "dribble", "drool", "dump", "dung", "enema", "erection", "fanny", "fart", "filth",
+  "floozy", "fondle", "git", "gob", "gonad", "groin", "grope", "heinie", "hiccup",
+  "honker", "hooter", "horny", "hump", "impotent", "keister", "knicker", "knob",
+  "knocker", "loin", "loo", "manky", "manure", "merkin", "minge", "minging", "moan",
+  "nad", "nappy", "nipple", "nob", "numpty", "orgasm", "pecker", "pee", "penis", "perv",
+  "phallus", "piddle", "pillock", "pimple", "piss", "ponce", "pong", "poo", "poop",
+  "potty", "prat", "prick", "pube", "pubic", "puke", "putz", "randy", "semen", "sewage",
+  "shag", "shat", "shit", "shite", "skank", "slobber", "snog", "snot", "sod", "spooge",
+  "strumpet", "suck", "thong", "tit", "tits", "tosspot", "tummy", "turd", "tush", "twat",
+  "twit", "vomit", "wally", "wang", "wank", "wee", "whore", "wiener", "willy",
 ];
 
 function edits(word) {

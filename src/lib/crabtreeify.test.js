@@ -376,6 +376,10 @@ test("related-word punchlines land in ordinary prose", () => {
     convert("The funny planner found a brick in the salmon at the third burger.", 0.15, ["silly"]),
     "The fanny plonker found a prick in the semen at the turd booger.",
   );
+  assert.equal(
+    convert("A visit to the hinge parade left a false trail.", 0.15, ["silly"]),
+    "A vomit to the minge prat left a phallus drool.",
+  );
 });
 
 test("weird words swap plain words for funny synonyms", () => {
@@ -383,9 +387,15 @@ test("weird words swap plain words for funny synonyms", () => {
     convert("Grab your umbrella; the gadgets caused a commotion and I ran away.", 0.15, ["weird"]),
     "Grab your bumbershoot; the doohickeys caused a hullabaloo and I skedaddled.",
   );
+  assert.equal(
+    convert("The scamp would linger over a cookie after the quarrel.", 0.15, ["weird"]),
+    "The jackanapes would lollygag over a snickerdoodle after the argy-bargy.",
+  );
   // Everyday words wait for more chaos.
   assert.equal(convert("What a fuss.", 0.15, ["weird"]), "What a fuss.");
   assert.equal(convert("What a fuss.", 0.5, ["weird"]), "What a kerfuffle.");
+  assert.equal(convert("What rubbish.", 0.15, ["weird"]), "What rubbish.");
+  assert.equal(convert("What rubbish.", 0.5, ["weird"]), "What folderol.");
 });
 
 test("a consonant-y replacement takes -ied and a hissing one takes -es", () => {
