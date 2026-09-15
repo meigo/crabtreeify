@@ -4,6 +4,8 @@ Turn plain English into Officer Crabtree nonsense from _'Allo 'Allo!_, the under
 
 **Live demo: <https://meigo.github.io/crabtreeify/>**
 
+![Crabtreeify app: sample text in the Original box, the chaos slider at Officer 0.35 with all three layers on, and the Crabtree output with 11 changed words highlighted](docs/screenshot.webp)
+
 Everything runs in your browser. Text never leaves the page, and share links keep their settings in the URL hash, which browsers do not send to servers.
 
 ## Examples
