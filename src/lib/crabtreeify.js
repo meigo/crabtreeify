@@ -8,10 +8,6 @@ function normalizeIntensity(value) {
   return Math.min(1, Math.max(0, numeric));
 }
 
-function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 function isCasedLetter(ch) {
   return /\p{L}/u.test(ch) && ch.toLowerCase() !== ch.toUpperCase();
 }
@@ -270,9 +266,9 @@ function applySubstrings(tokens, rules, intensity, alwaysApply) {
     for (const rule of rules) {
       if (rule.from.length < 4) continue;
       if (!ruleApplies(intensity, rule.minChaos, alwaysApply)) continue;
-      const regex = new RegExp(escapeRegex(rule.from), "i");
-      if (!regex.test(token.core)) continue;
-      token.core = token.core.replace(regex, (match) => preserveCase(match, rule.to));
+      const matchesWholeToken = token.core.toLowerCase() === rule.from.toLowerCase();
+      if (!matchesWholeToken) continue;
+      token.core = preserveCase(token.core, rule.to);
       token.locked = true;
       break;
     }

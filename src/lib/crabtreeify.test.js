@@ -228,6 +228,15 @@ test("preserves lowercase replacement for uncased-script words", () => {
   );
 });
 
+test("substring rules do not rewrite unrelated containing words", () => {
+  assert.equal(convert("chartreuse", 1, ["silly"]), "chartreuse");
+  assert.equal(convert("contextual", 1, ["silly"]), "contextual");
+});
+
+test("intended whole words still transform after substring hardening", () => {
+  assert.equal(convert("chart context", 1, ["silly"]), "fart cocktext");
+});
+
 test("normalizes invalid and out-of-range intensity", () => {
   const gradedLayer = {
     meta: { name: "graded", label: "Graded" },
