@@ -2,6 +2,8 @@
 
 Turn plain English into Officer Crabtree nonsense from _'Allo 'Allo!_, the undercover policeman whose "Good moaning" mangles every vowel. Paste some text, pick a chaos level, and get it back as Crabtree would say it: the show's own lines stay faithful, extra gags join in as chaos rises, and at full chaos the leftover words get their vowels mangled too.
 
+**Live demo: <https://meigo.github.io/crabtreeify/>**
+
 Everything runs in your browser. Text never leaves the page, and share links keep their settings in the URL hash, which browsers do not send to servers.
 
 ## Examples
