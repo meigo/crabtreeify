@@ -76,3 +76,26 @@ export function suggestFromTargets(punchlines, words, options = {}) {
   }
   return [...best.values()];
 }
+
+/** Sound-alikes rarer than this (occurrences per million words) seldom turn up in real text. */
+const MIN_FREQUENCY = 0.25;
+
+/**
+ * Rank Datamuse sounds-like results for a punchline, most common innocent words first. This
+ * finds pairs more than one letter apart ("boson" -> "bosom") that suggestFromTargets misses.
+ * @param {string} punchline
+ * @param {{ word: string, tags?: string[] }[]} results from `/words?sl=<punchline>&md=f`
+ * @param {{ skipFrom?: Set<string> }} [options]
+ */
+export function rankSoundAlikes(punchline, results, options = {}) {
+  const skipFrom = options.skipFrom ?? new Set();
+  const hits = [];
+  for (const { word, tags = [] } of results) {
+    if (!/^[a-z]{4,}$/.test(word) || word === punchline) continue;
+    if (STOPWORDS.has(word) || skipFrom.has(word)) continue;
+    const frequency = Number(tags.find((tag) => tag.startsWith("f:"))?.slice(2) ?? 0);
+    if (frequency < MIN_FREQUENCY) continue;
+    hits.push({ from: word, to: punchline, frequency });
+  }
+  return hits.sort((a, b) => b.frequency - a.frequency || a.from.localeCompare(b.from));
+}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { suggestFromTargets } from "./candidates.js";
+import { rankSoundAlikes, suggestFromTargets } from "./candidates.js";
 
 // prettier-ignore
 const words = new Set([
@@ -34,4 +34,33 @@ test("does not suggest glue words or the punchline itself", () => {
   assert.equal(found.and, undefined);
   assert.equal(found.will, undefined);
   assert.equal(found.piss, undefined);
+});
+
+test("ranks common sound-alikes first and drops rare or unusable ones", () => {
+  const results = [
+    { word: "bosom", tags: ["f:3.3"] },
+    { word: "boson", tags: ["f:0.3"] },
+    { word: "blossom", tags: ["f:6.1"] },
+    { word: "besom", tags: ["f:0.05"] },
+    { word: "bo som", tags: ["f:2"] },
+    { word: "Bosham", tags: ["f:1"] },
+    { word: "boso" },
+  ];
+  assert.deepEqual(rankSoundAlikes("bosom", results), [
+    { from: "blossom", to: "bosom", frequency: 6.1 },
+    { from: "boson", to: "bosom", frequency: 0.3 },
+  ]);
+});
+
+test("does not suggest glue words or words the rules already own", () => {
+  const results = [
+    { word: "this", tags: ["f:900"] },
+    { word: "sheet", tags: ["f:40"] },
+    { word: "shoot", tags: ["f:60"] },
+  ];
+  const hits = rankSoundAlikes("shit", results, { skipFrom: new Set(["sheet"]) });
+  assert.deepEqual(
+    hits.map((hit) => hit.from),
+    ["shoot"],
+  );
 });

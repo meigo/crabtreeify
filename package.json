@@ -13,6 +13,7 @@
     "test:ui": "vitest run --config vitest.config.js",
     "eval": "node scripts/eval.js",
     "suggest": "node scripts/suggest.js",
+    "suggest:sounds": "node scripts/suggest.js --sounds-like",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

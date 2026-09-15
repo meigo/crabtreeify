@@ -9,16 +9,18 @@ npm install
 npm run dev
 ```
 
-| Command                          | What it does                                  |
-| -------------------------------- | --------------------------------------------- |
-| `npm run dev`                    | Local web UI                                  |
-| `npm test`                       | Engine tests, then UI tests                   |
-| `npm run eval`                   | Coverage / jackpot / untouched-word report    |
-| `npm run build`                  | Production static site in `dist/`             |
-| `npm run cli -- "Good morning."` | Print a transformation                        |
-| `npm run lint`                   | ESLint (JS, Svelte, Tailwind class conflicts) |
-| `npm run format`                 | Prettier; `npm run format:check` only reports |
-| `npm run check`                  | Lint, format check, tests, then build         |
+| Command                          | What it does                                                |
+| -------------------------------- | ----------------------------------------------------------- |
+| `npm run dev`                    | Local web UI                                                |
+| `npm test`                       | Engine tests, then UI tests                                 |
+| `npm run eval`                   | Coverage / jackpot / untouched-word report                  |
+| `npm run build`                  | Production static site in `dist/`                           |
+| `npm run cli -- "Good morning."` | Print a transformation                                      |
+| `npm run suggest`                | Dictionary words one letter from a punchline (offline)      |
+| `npm run suggest:sounds`         | Common words that sound like a punchline (Datamuse, online) |
+| `npm run lint`                   | ESLint (JS, Svelte, Tailwind class conflicts)               |
+| `npm run format`                 | Prettier; `npm run format:check` only reports               |
+| `npm run check`                  | Lint, format check, tests, then build                       |
 
 A husky pre-commit hook runs `eslint --fix` and `prettier --write` on staged files.
 
