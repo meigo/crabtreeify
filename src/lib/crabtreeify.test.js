@@ -32,6 +32,36 @@ test("good morning stays good moaning, not goot moaning", () => {
   assert.equal(convert("Good morning.", 1), "Good moaning.");
 });
 
+test("matched canonical phrases survive later generative layers", () => {
+  assert.equal(
+    crabtreeify("Good morning.", layers, {
+      intensity: 1,
+      enabledLayers: ["canonical", "silly", "vowels"],
+    }),
+    "Good moaning.",
+  );
+});
+
+test("phrases do not cross sentence or arbitrary punctuation boundaries", () => {
+  assert.equal(convert("mother. in law", 0, ["canonical"]), "mither. in law");
+  assert.equal(convert("mother — in law", 0, ["canonical"]), "mither — in law");
+});
+
+test("phrase punctuation must match rule punctuation", () => {
+  const punctuatedLayer = {
+    meta: { name: "punctuated", label: "Punctuated" },
+    phrases: [{ from: "alpha, beta", to: "one two" }],
+  };
+  const run = (text) =>
+    crabtreeify(text, [punctuatedLayer], {
+      intensity: 1,
+      enabledLayers: ["punctuated"],
+    });
+
+  assert.equal(run("Alpha, beta"), "One, two");
+  assert.equal(run("Alpha beta"), "Alpha beta");
+});
+
 test("does not rewrite set/bit inside longer words", () => {
   const out = convert("The asset and butterfly are setting.", 1);
   assert.doesNotMatch(out, /asshit/i);

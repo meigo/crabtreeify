@@ -38,6 +38,28 @@ function wordsOf(phrase) {
   return [...phrase.toLowerCase().matchAll(wordRegex())].map((match) => match[0]);
 }
 
+function phraseShape(text) {
+  const tokens = tokenize(text);
+  const wordIdxs = tokens.map((token, index) => (token.kind === "word" ? index : -1))
+    .filter((index) => index >= 0);
+
+  return {
+    words: wordIdxs.map((index) => tokens[index].core.toLowerCase()),
+    separators: wordIdxs.slice(0, -1).map((index, position) => {
+      const next = wordIdxs[position + 1];
+      return tokens.slice(index + 1, next).map(tokenText).join("");
+    }),
+  };
+}
+
+function punctuationOf(separator) {
+  return separator.replace(/\s/gu, "");
+}
+
+function separatorsMatch(expected, actual) {
+  return punctuationOf(expected) === punctuationOf(actual);
+}
+
 /** Spread a yes/no decision evenly across words so chaos reads as density. */
 function passesDensity(intensity, seed) {
   const level = Number(intensity);
@@ -183,9 +205,7 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
     const next = preserveCase(fromCores[i], toWords[i]);
     const token = tokens[wordIdxs[i]];
     token.core = next;
-    if (next.toLowerCase() !== token.originalCore.toLowerCase()) {
-      token.locked = true;
-    }
+    token.locked = true;
   }
 
   if (toWords.length > fromWords.length) {
@@ -203,13 +223,17 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
   }
 }
 
+function separatorBetween(tokens, leftIndex, rightIndex) {
+  return tokens.slice(leftIndex + 1, rightIndex).map(tokenText).join("");
+}
+
 function applyPhrases(tokens, phrases, intensity, alwaysApply) {
   const wordIdxs = tokens.map((t, i) => (t.kind === "word" ? i : -1)).filter((i) => i >= 0);
   const used = new Set();
 
   for (const phrase of phrases) {
     if (!ruleApplies(intensity, phrase.minChaos, alwaysApply)) continue;
-    const fromWords = wordsOf(phrase.from);
+    const fromWords = phrase.shape.words;
     const toWords = wordsOf(phrase.to);
     if (!fromWords.length) continue;
 
@@ -218,6 +242,11 @@ function applyPhrases(tokens, phrases, intensity, alwaysApply) {
       if (span.some((i) => used.has(i) || tokens[i].locked)) continue;
       const matched = span.every((i, n) => tokens[i].core.toLowerCase() === fromWords[n]);
       if (!matched) continue;
+      const separatorsMatched = span.slice(0, -1).every((tokenIndex, position) => {
+        const actual = separatorBetween(tokens, tokenIndex, span[position + 1]);
+        return separatorsMatch(phrase.shape.separators[position], actual);
+      });
+      if (!separatorsMatched) continue;
       applyPhraseAt(tokens, span, fromWords, toWords);
       span.forEach((i) => used.add(i));
     }
@@ -280,9 +309,10 @@ export function normalizeLayer(layer) {
   }
 
   const phrases = sortPhrases(
-    (layer.phrases ?? []).map((p) => ({
-      ...p,
-      minChaos: p.minChaos ?? fallback,
+    (layer.phrases ?? []).map((phrase) => ({
+      ...phrase,
+      shape: phraseShape(phrase.from),
+      minChaos: phrase.minChaos ?? fallback,
     })),
   );
 
