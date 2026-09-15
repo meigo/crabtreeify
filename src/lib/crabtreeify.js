@@ -12,12 +12,17 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function isCasedLetter(ch) {
+  return /\p{L}/u.test(ch) && ch.toLowerCase() !== ch.toUpperCase();
+}
+
 function preserveCase(original, replacement) {
   if (!original || !replacement) return replacement;
-  if (original === original.toUpperCase() && /\p{L}/u.test(original)) {
+  if (original === original.toUpperCase() && [...original].some(isCasedLetter)) {
     return replacement.toUpperCase();
   }
-  if (original[0] === original[0].toUpperCase() && /\p{L}/u.test(original[0])) {
+  const first = original[0];
+  if (first === first.toUpperCase() && isCasedLetter(first)) {
     return replacement[0].toUpperCase() + replacement.slice(1);
   }
   return replacement;

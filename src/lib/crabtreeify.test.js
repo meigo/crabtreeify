@@ -170,6 +170,20 @@ test("preserves initial capitalization on accented words", () => {
   );
 });
 
+test("preserves lowercase replacement for uncased-script words", () => {
+  const layer = {
+    meta: { name: "uncased-script", label: "Uncased Script" },
+    wholeWords: {
+      中文: "replacement",
+    },
+  };
+
+  assert.equal(
+    crabtreeify("中文", [layer], { intensity: 0, enabledLayers: ["uncased-script"] }),
+    "replacement",
+  );
+});
+
 test("normalizes invalid and out-of-range intensity", () => {
   const gradedLayer = {
     meta: { name: "graded", label: "Graded" },
