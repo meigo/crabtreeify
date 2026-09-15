@@ -147,3 +147,24 @@ test("detailed output marks changed words", () => {
   assert.equal(moaning?.changed, true);
   assert.equal(moaning?.from.toLowerCase(), "morning");
 });
+
+test("normalizes invalid and out-of-range intensity", () => {
+  const gradedLayer = {
+    meta: { name: "graded", label: "Graded" },
+    wholeWords: {
+      test: { to: "changed", minChaos: 0.8 },
+    },
+  };
+
+  const run = (intensity) =>
+    crabtreeify("test", [gradedLayer], {
+      intensity,
+      enabledLayers: ["graded"],
+    });
+
+  assert.equal(run("not-a-number"), "test");
+  assert.equal(run(Number.NaN), "test");
+  assert.equal(run(Number.POSITIVE_INFINITY), "test");
+  assert.equal(run(-1), "test");
+  assert.equal(run(2), "changed");
+});

@@ -2,6 +2,12 @@ import { vowelSwap } from "./vowels.js";
 
 const DEFAULT_INTENSITY = 0.7;
 
+function normalizeIntensity(value) {
+  const numeric = Number(value ?? DEFAULT_INTENSITY);
+  if (!Number.isFinite(numeric)) return DEFAULT_INTENSITY;
+  return Math.min(1, Math.max(0, numeric));
+}
+
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -297,7 +303,7 @@ function toParts(tokens) {
 }
 
 export function crabtreeifyDetailed(text, layers, options = {}) {
-  const intensity = Number(options.intensity ?? DEFAULT_INTENSITY);
+  const intensity = normalizeIntensity(options.intensity);
   const enabledNames = options.enabledLayers;
   const source = text ?? "";
   const tokens = tokenize(source);
