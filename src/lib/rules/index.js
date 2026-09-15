@@ -28,7 +28,7 @@ export const canonicalQuotes = [
   },
   {
     original:
-      "I was pissing by the door, when I heard two shats. You are holding in your hand a smoking goon; you are clearly the guilty potty.",
+      "I was pissing by the door, when I heard two shats. You are holding in your hind a smoking goon; you are clearly the guilty potty.",
     source:
       "I was passing by the door, when I heard two shots. You are holding in your hand a smoking gun; you are clearly the guilty party.",
     note: "Classic interrogation scene (Fandom wiki, IMDb)",
@@ -45,7 +45,7 @@ export const canonicalQuotes = [
   },
   {
     original:
-      "God moaning. The resist-once have accqo-aired a bum. They are going to ex-plod the whaleway brodge.",
+      "Good moaning. The resist-once have accqo-aired a bum. They are going to ex-plod the whaleway brodge.",
     source:
       "Good morning. The resistance have acquired a bomb. They are going to explode the railway bridge.",
     note: "Resistance briefing (IMDb)",

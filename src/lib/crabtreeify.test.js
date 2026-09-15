@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { crabtreeify, crabtreeifyDetailed } from "./crabtreeify.js";
-import { layers } from "./rules/index.js";
+import { canonicalQuotes, layers } from "./rules/index.js";
 
 function convert(text, intensity = 1, enabled = ["canonical", "silly"]) {
   return crabtreeify(text, layers, { intensity, enabledLayers: enabled });
@@ -295,4 +295,10 @@ test("a phrase that drops words leaves no stray whitespace", () => {
 
   assert.equal(run("Alpha beta gamma."), "One two.");
   assert.equal(run("Alpha beta gamma delta"), "One two delta");
+});
+
+test("every show quote's source turns into its documented original", () => {
+  for (const quote of canonicalQuotes) {
+    assert.equal(convert(quote.source, 0, ["canonical"]), quote.original, quote.note);
+  }
 });
