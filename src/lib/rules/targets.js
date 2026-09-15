@@ -75,6 +75,10 @@ const seeds = [
   "anal", "anally", "pubic", "pubicly", "impotent", "erection", "erections",
   "human-titty", "tittles",
 
+  // found with Datamuse related-word lookups
+  "knocker", "knockers", "piddle", "piddles", "boob", "boobs", "booby", "boobies",
+  "pecker", "peckers", "hump", "humps", "breast", "breasts",
+
   // words worth exposing with a well-placed hyphen
   "suck", "sucks", "sucking", "meat", "meats", "bass", "dick", "dicks",
   "tickle", "tickles", "mint", "mints", "once",

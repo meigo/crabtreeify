@@ -34,6 +34,8 @@ CHAOS=1 npm run cli -- "Good morning."
 - **Silly substitutions** — extra malapropisms gated by chaos
 - **Vowel mangling** — fills leftover words without overriding curated jokes
 
+Some silly substitutions and jackpot words were found with the [Datamuse API](https://www.datamuse.com/api/).
+
 Share links store settings in the URL hash so the text is not sent to a server. Very long input is omitted from the link.
 
 ## Limits

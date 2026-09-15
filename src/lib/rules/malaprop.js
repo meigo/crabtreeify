@@ -194,6 +194,13 @@ export const core = {
     know: "knob",
     petty: "potty",
     song: "snog",
+
+    // Found with Datamuse sounds-like and related-word lookups.
+    bobby: "booby",
+    puddle: "piddle",
+    boson: "bosom",
+    beast: "breast",
+    abreast: "a breast",
   },
   phrases: [
     { from: "keep pace", to: "keep paste", priority: 70 },

@@ -103,3 +103,8 @@ test("does not jump a back vowel all the way to ee", () => {
     );
   }
 });
+
+test("lands on the newer jackpots when a vowel swap allows it", () => {
+  assert.equal(vowelSwap("baby"), "booby");
+  assert.equal(vowelSwap("hemp"), "hump");
+});

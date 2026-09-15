@@ -302,3 +302,18 @@ test("every show quote's source turns into its documented original", () => {
     assert.equal(convert(quote.source, 0, ["canonical"]), quote.original, quote.note);
   }
 });
+
+test("a bobby in a puddle gets the Crabtree treatment", () => {
+  assert.equal(
+    convert("The bobby stepped in a puddle.", 0.15, ["silly"]),
+    "The booby stepped in a piddle.",
+  );
+});
+
+test("science and news words find their bodily sound-alikes", () => {
+  assert.equal(convert("The Higgs boson.", 0.15, ["silly"]), "The Higgs bosom.");
+  assert.equal(
+    convert("Keep abreast of the beast.", 0.15, ["silly"]),
+    "Keep a breast of the breast.",
+  );
+});

@@ -12,12 +12,13 @@ const LETTERS = "abcdefghijklmnopqrstuvwxyz";
 // prettier-ignore
 export const companyPunchlines = [
   "anal", "arse", "balls", "bastard", "bitch", "bloody", "boob", "boobs",
-  "bollocks", "bonk", "bottom", "bowel", "bugger", "bum", "cock", "colon",
-  "crap", "crotch", "cunt", "dick", "dung", "enema", "erection", "fart",
-  "groin", "impotent", "knicker", "knob", "loo", "manure", "moan", "nappy",
-  "nipple", "orgasm", "penis", "piss", "pong", "poo", "poop", "potty",
-  "pubic", "sewage", "shag", "shat", "shit", "snog", "snot", "suck", "tit",
-  "tits", "turd", "wank", "wee", "whore", "willy",
+  "booby", "bollocks", "bonk", "bosom", "bottom", "bowel", "breast", "bugger",
+  "bum", "cock", "colon", "crap", "crotch", "cunt", "dick", "dung", "enema",
+  "erection", "fart", "groin", "hump", "impotent", "knicker", "knob", "knocker",
+  "loo", "manure", "moan", "nappy", "nipple", "orgasm", "pecker", "penis",
+  "piddle", "piss", "pong", "poo", "poop", "potty", "pubic", "sewage", "shag",
+  "shat", "shit", "snog", "snot", "suck", "tit", "tits", "turd", "wank", "wee",
+  "whore", "willy",
 ];
 
 function edits(word) {
