@@ -108,3 +108,39 @@ test("lands on the newer jackpots when a vowel swap allows it", () => {
   assert.equal(vowelSwap("baby"), "booby");
   assert.equal(vowelSwap("hemp"), "hump");
 });
+
+test("keeps the first vowel of a word that starts with one", () => {
+  // Readers know a word by its start: "imail" and "onder" read as typos, "aboot" as Crabtree.
+  assert.equal(vowelSwap("about"), "aboot");
+  assert.equal(vowelSwap("email"), "emool");
+  for (const word of ["under", "agenda", "invoice", "error", "easy", "else", "argue", "audio"]) {
+    const out = vowelSwap(word);
+    if (out === null) continue;
+    assert.equal(firstVowelGroup(out), firstVowelGroup(word), `${word} -> ${out}`);
+    assert.equal(out.slice(0, 2), word.slice(0, 2), `${word} -> ${out}`);
+  }
+});
+
+test("leaves a word-final vowel alone, in the plural too", () => {
+  assert.equal(vowelSwap("apple"), null);
+  assert.equal(vowelSwap("apples"), null);
+  assert.equal(vowelSwap("only"), null);
+});
+
+test("still swaps a lone vowel or lands a jackpot at the edges of a word", () => {
+  assert.equal(vowelSwap("eggs"), "oggs");
+  assert.equal(vowelSwap("onus"), "anus");
+});
+
+test("leaves an unstressed ending alone", () => {
+  // "lookod", "kitchin" and "acteen" read as typos; the stressed vowel is the one to mangle.
+  assert.equal(vowelSwap("looked"), "luked");
+  assert.equal(vowelSwap("kitchen"), "kotchen");
+  assert.equal(vowelSwap("action"), null);
+  assert.equal(vowelSwap("error"), null);
+});
+
+test("still collapses a final -er into -a like the show's wata", () => {
+  assert.equal(vowelSwap("after"), "afta");
+  assert.equal(vowelSwap("other"), "otha");
+});

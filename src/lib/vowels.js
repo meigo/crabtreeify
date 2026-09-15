@@ -114,10 +114,36 @@ function candidatesFor(word) {
     out.push({
       candidate: word.slice(0, at) + to + word.slice(at + from.length),
       score: 4,
+      rhotic: to,
     });
   }
 
   return out;
+}
+
+/**
+ * Readers know a word by its start and Crabtree mangles the stressed vowel, so a word keeps a vowel
+ * it starts with ("about" -> "aboot", not "ebout"), a vowel it ends on, before a plural -s too
+ * ("apple" and "apples" stay), and an unstressed ending ("looked", "action", "error"). The show's
+ * -er -> -a collapse is still fine there ("after" -> "afta", like "wata"). A word with a single
+ * vowel group has nothing else to mangle ("eggs" -> "oggs").
+ */
+function touchesEdgeVowel(word, candidate, groups, rhotic) {
+  if (groups.length < 2) return false;
+  let changedAt = 0;
+  while (changedAt < word.length && candidate[changedAt] === word[changedAt]) changedAt += 1;
+  const [first] = groups;
+  if (first.index === 0 && changedAt <= first[0].length) return true;
+  const last = groups.at(-1);
+  const end = last.index + last[0].length;
+  const endsWord = end === word.length || (end === word.length - 1 && word.endsWith("s"));
+  if (endsWord && changedAt >= last.index) return true;
+  // A lone vowel letter in the last syllable is unstressed, and so are -ion, -ian, -ious and -ous.
+  const unstressed =
+    last[0].length === 1 ||
+    /^(io|ia|iou|eou)$/.test(last[0]) ||
+    (last[0] === "ou" && word.endsWith("ous"));
+  return unstressed && rhotic !== "a" && changedAt >= last.index;
 }
 
 /**
@@ -138,12 +164,14 @@ export function vowelSwap(word) {
   // result is funny in its own right ("pie" -> "poo").
   const jackpotOnly = lower.length < 4;
 
+  const groups = [...lower.matchAll(VOWEL_GROUPS)];
   let best = null;
-  for (const { candidate, score } of candidatesFor(lower)) {
+  for (const { candidate, score, rhotic } of candidatesFor(lower)) {
     if (candidate === lower) continue;
     if (!isPronounceable(candidate)) continue;
     const jackpot = targets.has(candidate);
     if (jackpotOnly && !jackpot) continue;
+    if (!jackpot && touchesEdgeVowel(lower, candidate, groups, rhotic)) continue;
     const total = jackpot ? score + 100 : score;
     if (!best || total > best.total) best = { candidate, total };
   }
