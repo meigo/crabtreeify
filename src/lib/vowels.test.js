@@ -144,3 +144,13 @@ test("still collapses a final -er into -a like the show's wata", () => {
   assert.equal(vowelSwap("after"), "afta");
   assert.equal(vowelSwap("other"), "otha");
 });
+
+test("leaves pronoun-like glue words alone", () => {
+  // "evirybody", "huwever" and "thamselves" read as typos, not an accent.
+  // prettier-ignore
+  const words = [
+    "everybody", "anyone", "something", "nowhere", "whatever", "however",
+    "myself", "themselves", "already", "although", "anyway", "otherwise",
+  ];
+  for (const word of words) assert.equal(vowelSwap(word), null, word);
+});

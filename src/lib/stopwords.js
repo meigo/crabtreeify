@@ -9,4 +9,12 @@ export const STOPWORDS = new Set([
   "them", "my", "your", "his", "its", "our", "their", "who", "whom",
   "no", "not", "yes", "than", "then", "there", "here", "what", "which",
   "all", "any", "some", "more", "most", "such", "each", "both", "too",
+  // Pronoun-like compounds and linking words mangle into typos ("evirybody", "huwever").
+  "every", "everybody", "everyone", "everything", "everywhere",
+  "anybody", "anyone", "anything", "anywhere",
+  "somebody", "someone", "something", "somewhere", "nobody", "nothing", "nowhere",
+  "whatever", "whoever", "whenever", "wherever", "whichever", "however",
+  "myself", "yourself", "himself", "herself", "itself", "oneself",
+  "ourselves", "yourselves", "themselves",
+  "already", "although", "anyway", "otherwise",
 ]);
