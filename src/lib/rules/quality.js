@@ -15,11 +15,13 @@ import { targets } from "./targets.js";
  * original: "a-tension" and "attention" both come out as "atenshun".
  */
 function phoneticKey(word) {
-  return word
-    .toLowerCase()
-    .replace(/[ts]ion/g, "shun")
-    // Doubled consonants are silent; doubled vowels are not ("poo" vs "po").
-    .replace(/([^aeiou])\1+/g, "$1");
+  return (
+    word
+      .toLowerCase()
+      .replace(/[ts]ion/g, "shun")
+      // Doubled consonants are silent; doubled vowels are not ("poo" vs "po").
+      .replace(/([^aeiou])\1+/g, "$1")
+  );
 }
 
 function editDistanceAtMost1(a, b) {

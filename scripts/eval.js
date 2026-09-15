@@ -13,12 +13,10 @@ import { targets } from "../src/lib/rules/targets.js";
 import { findWeakPairs } from "../src/lib/rules/quality.js";
 
 const CORPUS = {
-  show:
-    "Good morning. I was passing by the door, when I heard two shots. You are holding in your hand a smoking gun; you are clearly the guilty party.",
+  show: "Good morning. I was passing by the door, when I heard two shots. You are holding in your hand a smoking gun; you are clearly the guilty party.",
   science:
     "The numbers are staggering: The DOE's light and neutron source facilities now produce tens of petabytes of data annually, roughly equivalent to streaming 2 million hours of HD video. Upgraded detectors, which have gone from capturing a single image every six seconds to 100,000 images per second, mean these facilities now generate orders of magnitude more data than they did a decade ago, and traditional manual analysis simply cannot keep pace.",
-  news:
-    "Days after two former Anthropic safety researchers publicly aired concerns that the existential threats AI might pose to humanity were receiving too little attention, Dario Amodei outlined a plan for companies and governments around the world to ensure that increasingly capable AI models remain aligned with the commands and values of responsible people.",
+  news: "Days after two former Anthropic safety researchers publicly aired concerns that the existential threats AI might pose to humanity were receiving too little attention, Dario Amodei outlined a plan for companies and governments around the world to ensure that increasingly capable AI models remain aligned with the commands and values of responsible people.",
   office:
     "Please reset your password before the meeting and check the pie chart in the context menu. I have attached the quarterly report and the budget spreadsheet for your review.",
   plain:
@@ -96,6 +94,4 @@ for (const [name, text] of Object.entries(CORPUS)) {
     }
   }
 }
-console.log(
-  problems.length ? problems.join("\n") : "no weak, unpronounceable or bloated swaps",
-);
+console.log(problems.length ? problems.join("\n") : "no weak, unpronounceable or bloated swaps");

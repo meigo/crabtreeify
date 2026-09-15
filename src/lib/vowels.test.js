@@ -74,6 +74,7 @@ test("does not stretch an existing o into oo", () => {
 });
 
 test("mixes Crabtree vowels instead of turning every word to o", () => {
+  // prettier-ignore
   const words = [
     "human", "brain", "capabilities", "animals", "lack", "distinctive",
     "species", "owes", "dominant", "position", "machine", "surpassed",
@@ -84,7 +85,10 @@ test("mixes Crabtree vowels instead of turning every word to o", () => {
   const swapped = words.map((word) => vowelSwap(word)).filter(Boolean);
   const oFirst = swapped.filter((word) => /^o+$/.test(firstVowelGroup(word))).length;
   const ratio = oFirst / swapped.length;
-  assert.ok(ratio < 0.65, `too much o: ${oFirst}/${swapped.length} (${Math.round(ratio * 100)}%) ${swapped.join(", ")}`);
+  assert.ok(
+    ratio < 0.65,
+    `too much o: ${oFirst}/${swapped.length} (${Math.round(ratio * 100)}%) ${swapped.join(", ")}`,
+  );
   assert.ok(ratio > 0.15, `lost the o bias: ${oFirst}/${swapped.length}`);
 });
 

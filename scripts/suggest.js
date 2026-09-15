@@ -28,8 +28,9 @@ const skipFrom = new Set([
   ...Object.keys(canonical.wholeWords),
 ]);
 
-const hits = suggestFromTargets(companyPunchlines, loadWordList(), { skipFrom })
-  .filter((hit) => hit.from.length >= 4 && hit.score >= 10);
+const hits = suggestFromTargets(companyPunchlines, loadWordList(), { skipFrom }).filter(
+  (hit) => hit.from.length >= 4 && hit.score >= 10,
+);
 
 for (const hit of hits) {
   console.log(`${hit.from} -> ${hit.to}  (${hit.score})`);

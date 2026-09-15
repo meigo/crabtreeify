@@ -23,7 +23,7 @@
 
   let input = $state(params.get("text") || sampleText);
   let intensity = $state(clampChaos(params.get("chaos")));
-  let enabledLayers = $state(parseLayersParam(params.get("layers")));
+  const enabledLayers = $state(parseLayersParam(params.get("layers")));
   let copied = $state(false);
   let shared = $state(false);
   let status = $state("");
@@ -37,9 +37,7 @@
     crabtreeifyDetailed(input, layers, { intensity, enabledLayers: enabledNames() }),
   );
 
-  let chaosName = $derived(
-    intensity < 0.2 ? "Canonical" : intensity < 0.9 ? "Officer" : "Bonkers",
-  );
+  let chaosName = $derived(intensity < 0.2 ? "Canonical" : intensity < 0.9 ? "Officer" : "Bonkers");
 
   let shareTooLong = $derived(input.length > SHARE_TEXT_LIMIT);
 
@@ -106,7 +104,9 @@
     const url = new URL(path, window.location.origin).toString();
     const ok = await copyValue(
       url,
-      shareTooLong ? "Link copied without the text — it was too long to share." : "Share link copied.",
+      shareTooLong
+        ? "Link copied without the text — it was too long to share."
+        : "Share link copied.",
     );
     if (!ok) return;
     history.replaceState(null, "", path);
@@ -122,24 +122,25 @@
     </p>
   </header>
 
-  <p class="sr-only" role="status" aria-live="polite">{#if status}{status}{/if}</p>
+  <p class="sr-only" role="status" aria-live="polite">
+    {#if status}{status}{/if}
+  </p>
 
   <section class="mb-8">
-    <label for="input" class="mb-2 block text-xs uppercase tracking-wider text-muted">
+    <label for="input" class="mb-2 block text-xs tracking-wider text-muted uppercase">
       Original
     </label>
     <textarea
       id="input"
       rows="6"
       bind:value={input}
-      placeholder="Type or paste something sensible..."
-    ></textarea>
+      placeholder="Type or paste something sensible..."></textarea>
     <div class="mt-2 flex flex-wrap gap-2">
       <button type="button" onclick={loadSample}>Load sample</button>
       <label class="sr-only" for="quote">Load a show quote</label>
       <select id="quote" onchange={loadQuote}>
         <option value="">Load a show quote…</option>
-        {#each canonicalQuotes as quote, index}
+        {#each canonicalQuotes as quote, index (index)}
           <option value={index}>{quote.note}</option>
         {/each}
       </select>
@@ -148,7 +149,7 @@
 
   <section class="mb-8">
     <div class="mb-2 flex items-baseline justify-between gap-3">
-      <label for="intensity" class="text-xs uppercase tracking-wider text-muted">Chaos</label>
+      <label for="intensity" class="text-xs tracking-wider text-muted uppercase">Chaos</label>
       <span class="text-xs text-muted">{chaosName} · {intensity.toFixed(2)}</span>
     </div>
     <input
@@ -167,7 +168,7 @@
       Canonical keeps the original malapropisms. Officer adds common gags. Bonkers mangles the rest.
     </p>
     <div class="mt-3 flex flex-wrap gap-2">
-      {#each chaosPresets as preset}
+      {#each chaosPresets as preset (preset.label)}
         <button
           type="button"
           aria-pressed={intensity === preset.value}
@@ -181,9 +182,9 @@
 
   <section class="mb-8">
     <fieldset class="m-0 border-0 p-0">
-      <legend class="mb-2 px-0 text-xs uppercase tracking-wider text-muted">Layers</legend>
+      <legend class="mb-2 px-0 text-xs tracking-wider text-muted uppercase">Layers</legend>
       <div class="flex flex-col gap-2">
-        {#each layerList as layer}
+        {#each layerList as layer (layer.name)}
           <label class="flex cursor-pointer items-baseline gap-2.5 text-sm">
             <input type="checkbox" bind:checked={enabledLayers[layer.name]} />
             <span>
@@ -201,7 +202,7 @@
 
   <section>
     <div class="mb-2 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
-      <p id="output-label" class="text-xs uppercase tracking-wider text-muted">
+      <p id="output-label" class="text-xs tracking-wider text-muted uppercase">
         Crabtree
         {#if result.changeCount}
           · {result.changeCount} changed
@@ -220,8 +221,8 @@
               type="button"
               class="change"
               title="{part.from} → {part.text}"
-              aria-label="Changed from {part.from} to {part.text}"
-            >{part.text}</button>
+              aria-label="Changed from {part.from} to {part.text}">{part.text}</button
+            >
           {:else}
             {part.text}
           {/if}

@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { suggestFromTargets } from "./candidates.js";
 
+// prettier-ignore
 const words = new Set([
   "pass", "piss", "sheet", "shit", "fact", "fart", "walk", "wank",
   "beach", "bitch", "mean", "moan", "small", "smell", "cork", "cock",
@@ -14,7 +15,10 @@ function byFrom(hits) {
 
 test("finds company-safe words one nudge from a vulgar punchline", () => {
   const found = byFrom(
-    suggestFromTargets(["piss", "shit", "fart", "wank", "bitch", "cock", "moan", "smell", "shat"], words),
+    suggestFromTargets(
+      ["piss", "shit", "fart", "wank", "bitch", "cock", "moan", "smell", "shat"],
+      words,
+    ),
   );
   assert.equal(found.pass, "piss");
   assert.equal(found.fact, "fart");

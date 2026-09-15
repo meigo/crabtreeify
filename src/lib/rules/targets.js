@@ -2,6 +2,7 @@
  * Jackpot words. If a vowel swap happens to land on one of these,
  * take it — this is where Crabtree's innuendo comes from.
  */
+// prettier-ignore
 const seeds = [
   // the classics the show actually used
   "piss", "pissed", "pissing", "pisser", "pissage", "pissable",

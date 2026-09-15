@@ -1,3 +1,4 @@
+// prettier-ignore
 export const STOPWORDS = new Set([
   "the", "a", "an", "and", "or", "but", "if", "so", "as", "of", "to", "in",
   "on", "at", "by", "for", "from", "with", "that", "this", "these", "those",

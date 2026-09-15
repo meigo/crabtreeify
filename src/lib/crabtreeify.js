@@ -44,7 +44,10 @@ function phraseShape(text) {
     words: wordIdxs.map((index) => tokens[index].core.toLowerCase()),
     separators: wordIdxs.slice(0, -1).map((index, position) => {
       const next = wordIdxs[position + 1];
-      return tokens.slice(index + 1, next).map(tokenText).join("");
+      return tokens
+        .slice(index + 1, next)
+        .map(tokenText)
+        .join("");
     }),
   };
 }
@@ -220,7 +223,10 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
 }
 
 function separatorBetween(tokens, leftIndex, rightIndex) {
-  return tokens.slice(leftIndex + 1, rightIndex).map(tokenText).join("");
+  return tokens
+    .slice(leftIndex + 1, rightIndex)
+    .map(tokenText)
+    .join("");
 }
 
 function applyPhrases(tokens, phrases, intensity, alwaysApply) {

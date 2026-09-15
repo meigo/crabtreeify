@@ -61,9 +61,7 @@ test("no rule is written for a plural while its singular is ignored", (t) => {
     layers,
     (word) => words.has(word) && !notReallyInflections.has(word),
   );
-  const listed = lonely
-    .map((l) => `${l.from} -> ${l.to}, but "${l.base}": ${l.reason}`)
-    .join("\n");
+  const listed = lonely.map((l) => `${l.from} -> ${l.to}, but "${l.base}": ${l.reason}`).join("\n");
   assert.equal(lonely.length, 0, `inflections without a base form:\n${listed}`);
 });
 

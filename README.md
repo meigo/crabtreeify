@@ -1,6 +1,6 @@
 # Crabtreeify
 
-Turn plain English into Officer Crabtree nonsense from *'Allo 'Allo!*. Canonical show malapropisms stay in place; optional layers add later gags and vowel mangling.
+Turn plain English into Officer Crabtree nonsense from _'Allo 'Allo!_. Canonical show malapropisms stay in place; optional layers add later gags and vowel mangling.
 
 ## Run
 
@@ -9,13 +9,18 @@ npm install
 npm run dev
 ```
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Local web UI |
-| `npm test` | Engine tests, then UI tests |
-| `npm run eval` | Coverage / jackpot / untouched-word report |
-| `npm run build` | Production static site in `dist/` |
-| `npm run cli -- "Good morning."` | Print a transformation |
+| Command                          | What it does                                  |
+| -------------------------------- | --------------------------------------------- |
+| `npm run dev`                    | Local web UI                                  |
+| `npm test`                       | Engine tests, then UI tests                   |
+| `npm run eval`                   | Coverage / jackpot / untouched-word report    |
+| `npm run build`                  | Production static site in `dist/`             |
+| `npm run cli -- "Good morning."` | Print a transformation                        |
+| `npm run lint`                   | ESLint (JS, Svelte, Tailwind class conflicts) |
+| `npm run format`                 | Prettier; `npm run format:check` only reports |
+| `npm run check`                  | Lint, format check, tests, then build         |
+
+A husky pre-commit hook runs `eslint --fix` and `prettier --write` on staged files.
 
 Chaos is a 0–1 density. `0` keeps original Crabtree lines. Higher values add silly substitutions, then generative vowel swaps. The CLI uses the engine default (`0.7`) unless you set `CHAOS`.
 

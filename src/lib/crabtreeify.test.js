@@ -8,11 +8,7 @@ function convert(text, intensity = 1, enabled = ["canonical", "silly"]) {
 }
 
 test("preserves later capitals inside a phrase", () => {
-  const out = convert(
-    "I was passing by the door and I thought I would drop in.",
-    0,
-    ["canonical"],
-  );
+  const out = convert("I was passing by the door and I thought I would drop in.", 0, ["canonical"]);
   assert.match(out, /I thought I would drip in/);
   assert.doesNotMatch(out, /i thought i would drip in/);
 });
@@ -171,11 +167,9 @@ test("essay prose gets silly malapropisms without vowel mangling", () => {
 });
 
 test("company-memo words fall onto vulgar punchlines", () => {
-  const out = convert(
-    "The bigger batch will ship after a mature review of the suit.",
-    0.35,
-    ["silly"],
-  );
+  const out = convert("The bigger batch will ship after a mature review of the suit.", 0.35, [
+    "silly",
+  ]);
   assert.match(out, /bugger/i);
   assert.match(out, /bitch/i);
   assert.match(out, /shit/i);

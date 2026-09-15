@@ -9,6 +9,7 @@ import { STOPWORDS } from "../stopwords.js";
 const LETTERS = "abcdefghijklmnopqrstuvwxyz";
 
 /** Punchlines you would not put in a company memo. */
+// prettier-ignore
 export const companyPunchlines = [
   "anal", "arse", "balls", "bastard", "bitch", "bloody", "boob", "boobs",
   "bollocks", "bonk", "bottom", "bowel", "bugger", "bum", "cock", "colon",
@@ -65,7 +66,9 @@ export function suggestFromTargets(punchlines, words, options = {}) {
     }
   }
 
-  hits.sort((a, b) => b.score - a.score || a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
+  hits.sort(
+    (a, b) => b.score - a.score || a.from.localeCompare(b.from) || a.to.localeCompare(b.to),
+  );
   const best = new Map();
   for (const hit of hits) {
     if (!best.has(hit.from)) best.set(hit.from, hit);
