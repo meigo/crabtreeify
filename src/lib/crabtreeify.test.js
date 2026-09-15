@@ -153,7 +153,21 @@ test("matches canonical rules containing accented letters", () => {
 });
 
 test("preserves unrelated accented words and punctuation", () => {
-  assert.equal(convert("café résumé naïve", 0, ["canonical"]), "café résumé naïve");
+  assert.equal(convert("café, résumé — naïve!", 0, ["canonical"]), "café, résumé — naïve!");
+});
+
+test("preserves initial capitalization on accented words", () => {
+  const layer = {
+    meta: { name: "accented-case", label: "Accented Case" },
+    wholeWords: {
+      éclair: "replacement",
+    },
+  };
+
+  assert.equal(
+    crabtreeify("Éclair", [layer], { intensity: 0, enabledLayers: ["accented-case"] }),
+    "Replacement",
+  );
 });
 
 test("normalizes invalid and out-of-range intensity", () => {

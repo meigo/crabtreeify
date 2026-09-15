@@ -14,10 +14,10 @@ function escapeRegex(str) {
 
 function preserveCase(original, replacement) {
   if (!original || !replacement) return replacement;
-  if (original === original.toUpperCase() && /[A-Za-z]/.test(original)) {
+  if (original === original.toUpperCase() && /\p{L}/u.test(original)) {
     return replacement.toUpperCase();
   }
-  if (original[0] === original[0].toUpperCase() && /[A-Za-z]/.test(original[0])) {
+  if (original[0] === original[0].toUpperCase() && /\p{L}/u.test(original[0])) {
     return replacement[0].toUpperCase() + replacement.slice(1);
   }
   return replacement;
