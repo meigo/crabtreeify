@@ -357,3 +357,16 @@ test("doubled consonants in the input reach their base word", () => {
   // -er words are often words of their own: a shutter is not someone who shuts.
   assert.equal(run("shutter"), "shutter");
 });
+
+test("sound-alike punchlines land in ordinary prose", () => {
+  assert.equal(
+    convert("The competent mentor was beaming at the cinema after his annual bonus.", 0.15, [
+      "silly",
+    ]),
+    "The impotent manure was bumming at the enema after his anal penis.",
+  );
+  assert.equal(
+    convert("Stop shaking and shouting in the bank.", 0.15, ["silly"]),
+    "Stop shagging and shitting in the bonk.",
+  );
+});
