@@ -1,5 +1,6 @@
 import { targets } from "./rules/targets.js";
 import { STOPWORDS } from "./stopwords.js";
+import { stressedSyllable } from "./stress.js";
 
 /**
  * Generative half of the joke. Officer Crabtree's actual device was vowel
@@ -126,23 +127,27 @@ function candidatesFor(word) {
  * it starts with ("about" -> "aboot", not "ebout"), a vowel it ends on, before a plural -s too
  * ("apple" and "apples" stay), and an unstressed ending ("looked", "action", "error"). The show's
  * -er -> -a collapse is still fine there ("after" -> "afta", like "wata"). A word with a single
- * vowel group has nothing else to mangle ("eggs" -> "oggs").
+ * vowel group has nothing else to mangle ("eggs" -> "oggs"). Where the CMU dictionary knows the
+ * stressed syllable, every vowel before it is kept too ("remember" -> "remomber", not "romember"),
+ * and a stressed last syllable does not count as an unstressed ending ("return", "event").
  */
-function touchesEdgeVowel(word, candidate, groups, rhotic) {
+function touchesEdgeVowel(word, candidate, groups, rhotic, stressed) {
   if (groups.length < 2) return false;
   let changedAt = 0;
   while (changedAt < word.length && candidate[changedAt] === word[changedAt]) changedAt += 1;
   const [first] = groups;
   if (first.index === 0 && changedAt <= first[0].length) return true;
+  if (stressed > 0 && changedAt < groups[stressed].index) return true;
   const last = groups.at(-1);
   const end = last.index + last[0].length;
   const endsWord = end === word.length || (end === word.length - 1 && word.endsWith("s"));
   if (endsWord && changedAt >= last.index) return true;
   // A lone vowel letter in the last syllable is unstressed, and so are -ion, -ian, -ious and -ous.
   const unstressed =
-    last[0].length === 1 ||
-    /^(io|ia|iou|eou)$/.test(last[0]) ||
-    (last[0] === "ou" && word.endsWith("ous"));
+    stressed !== groups.length - 1 &&
+    (last[0].length === 1 ||
+      /^(io|ia|iou|eou)$/.test(last[0]) ||
+      (last[0] === "ou" && word.endsWith("ous")));
   return unstressed && rhotic !== "a" && changedAt >= last.index;
 }
 
@@ -165,13 +170,15 @@ export function vowelSwap(word) {
   const jackpotOnly = lower.length < 4;
 
   const groups = [...lower.matchAll(VOWEL_GROUPS)];
+  // Spelled vowel groups only roughly match syllables, so a stress past the last group means the last.
+  const stressed = Math.min(stressedSyllable(lower), groups.length - 1);
   let best = null;
   for (const { candidate, score, rhotic } of candidatesFor(lower)) {
     if (candidate === lower) continue;
     if (!isPronounceable(candidate)) continue;
     const jackpot = targets.has(candidate);
     if (jackpotOnly && !jackpot) continue;
-    if (!jackpot && touchesEdgeVowel(lower, candidate, groups, rhotic)) continue;
+    if (!jackpot && touchesEdgeVowel(lower, candidate, groups, rhotic, stressed)) continue;
     const total = jackpot ? score + 100 : score;
     if (!best || total > best.total) best = { candidate, total };
   }

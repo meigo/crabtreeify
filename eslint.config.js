@@ -66,6 +66,6 @@ export default [
     },
   },
   {
-    ignores: ["dist/", ".worktrees/"],
+    ignores: ["dist/", ".worktrees/", "src/lib/stress-data.js"],
   },
 ];

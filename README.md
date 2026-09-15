@@ -28,7 +28,7 @@ The engine (`src/lib/crabtreeify.js`) splits text into words and separators, the
 1. **Original Crabtree** (`src/lib/rules/canonical.js`) — documented swaps and whole quotes from the show (`good morning` → `good moaning`, `passing` → `pissing`). Applies at every chaos level, and a matched quote locks the whole line.
 2. **Silly substitutions** (`src/lib/rules/silly.js`, `malaprop.js`) — malapropisms that land on a different, ruder word (`source` → `sauce`, `direction` → `erection`), unlocked in bands as chaos passes 0.15, 0.45 and 0.8.
 3. **Weird words** (`src/lib/rules/weird.js`) — funny-sounding synonyms that are not rude at all (`umbrella` → `bumbershoot`, `fuss` → `kerfuffle`, `ran away` → `skedaddled`). Rarer words swap from chaos 0.15, everyday ones from 0.45.
-4. **Vowel mangling** (`src/lib/vowels.js`) — a generative catch-all for whatever is left. It nudges one vowel group towards Crabtree's favourite vowels and prefers any swap that lands on a jackpot word from `src/lib/rules/targets.js` (`pass` → `piss`, `baby` → `booby`). It leaves a vowel the word starts or ends with alone, and an unstressed ending too (`about` → `aboot`, not `ebout`; `looked` → `luked`, not `lookod`; `apple` stays `apple`). The exceptions are the show's `-er` → `-a` (`after` → `afta`), a word's only vowel (`eggs` → `oggs`) and swaps that land on a jackpot. Chaos sets how many words it touches, and names are spared until full chaos.
+4. **Vowel mangling** (`src/lib/vowels.js`) — a generative catch-all for whatever is left. It nudges one vowel group towards Crabtree's favourite vowels and prefers any swap that lands on a jackpot word from `src/lib/rules/targets.js` (`pass` → `piss`, `baby` → `booby`). It leaves a vowel the word starts or ends with alone, and an unstressed ending too (`about` → `aboot`, not `ebout`; `looked` → `luked`, not `lookod`; `apple` stays `apple`). The exceptions are the show's `-er` → `-a` (`after` → `afta`), a word's only vowel (`eggs` → `oggs`) and swaps that land on a jackpot. Where the [CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict) knows a word's stressed syllable, every vowel before it stays too (`remember` → `remomber`, not `romember`). Chaos sets how many words it touches, and names are spared until full chaos.
 
 Rules match whole words and their simple inflections (`src/lib/morphology.js`): `publicly` → `pubicly`, `banking` → `bonking`, `dropped` → `dripped`, with the result spelled like English (`knobbing`, `manured`, `willies`). The original word's capitalisation is kept.
 
@@ -51,6 +51,7 @@ npm run check          # lint, format check, tests, then build
 npm run lint           # eslint (JS, Svelte, Tailwind class conflicts)
 npm run format         # prettier; format:check only reports
 npm run build          # static site in dist/
+npm run build:stress   # regenerate src/lib/stress-data.js from the CMU Pronouncing Dictionary
 ```
 
 A husky pre-commit hook runs ESLint and Prettier on staged files.
@@ -80,6 +81,7 @@ Add a good `suggest:related` word to `companyPunchlines`, then `suggest:sounds` 
 - English only, and the rules are hand-curated, so plenty of words stay untouched below full chaos.
 - Phrase matches do not cross sentence-ending punctuation. Rules match whole words and their simple inflections, so `chartreuse` is left alone.
 - Inflection is heuristic; rare forms can come out odd (`tightly` → `titly`).
+- Stress data lines up syllables with spelled vowels only roughly, so a few words still change an unstressed vowel (`reality` → `realoty`). The data also adds about 110 KB gzipped to the page.
 - Vowel mangling only touches plain ASCII words. Accented words change only through explicit rules (`René` → `Ronnie`).
 - Very long input is left out of share links.
 
@@ -88,6 +90,7 @@ Add a good `suggest:related` word to `companyPunchlines`, then `suggest:sounds` 
 - Officer Crabtree was played by Arthur Bostrom in the BBC sitcom _'Allo 'Allo!_ (1982–1992). The original swaps and quotes were collected from Wikipedia, the _'Allo 'Allo!_ Fandom wiki and IMDb. This is an unofficial fan parody, not affiliated with the BBC or the show's makers.
 - Some silly substitutions and jackpot words were found with the [Datamuse API](https://www.datamuse.com/api/) and [Related Words](https://relatedwords.org/).
 - Weird words come from the funny-word lists at [Busuu](https://www.busuu.com/en/english/funny-words) and [Parade](https://parade.com/1195613/marynliles/funny-words/).
+- Word stress comes from the [CMU Pronouncing Dictionary](http://www.speech.cs.cmu.edu/cgi-bin/cmudict), through the ISC-licensed [`cmu-pronouncing-dictionary`](https://www.npmjs.com/package/cmu-pronouncing-dictionary) package.
 - Built with [Svelte 5](https://svelte.dev/), [Vite](https://vite.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
 ## License

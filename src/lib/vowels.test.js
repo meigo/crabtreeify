@@ -154,3 +154,16 @@ test("leaves pronoun-like glue words alone", () => {
   ];
   for (const word of words) assert.equal(vowelSwap(word), null, word);
 });
+
+test("keeps vowels before the stressed syllable", () => {
+  // re-MEM-ber and in-tro-DUCE: "romember" and "intruduce" change a vowel nobody stresses.
+  // prettier-ignore
+  const cases = [["remember", "rem"], ["introduce", "introd"], ["return", "ret"], ["event", "ev"]];
+  for (const [word, kept] of cases) {
+    const out = vowelSwap(word);
+    assert.notEqual(out, null, `${word} should still be mangled on its stressed vowel`);
+    assert.ok(out.startsWith(kept), `${word} -> ${out}`);
+  }
+  // PRES-i-dent is stressed on its first syllable, so that is still the vowel to change.
+  assert.equal(vowelSwap("president"), "prosident");
+});

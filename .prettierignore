@@ -2,4 +2,5 @@ dist
 node_modules
 package-lock.json
 docs
+src/lib/stress-data.js
 .worktrees
