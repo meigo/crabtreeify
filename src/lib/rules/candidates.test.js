@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { rankSoundAlikes, suggestFromTargets } from "./candidates.js";
+import { rankRelated, rankSoundAlikes, suggestFromTargets } from "./candidates.js";
 
 // prettier-ignore
 const words = new Set([
@@ -62,5 +62,22 @@ test("does not suggest glue words or words the rules already own", () => {
   assert.deepEqual(
     hits.map((hit) => hit.from),
     ["shoot"],
+  );
+});
+
+test("ranks related words by how many punchlines they came back for", () => {
+  const results = new Map([
+    ["bum", [{ word: "Butt" }, { word: "backside" }, { word: "hobo" }, { word: "the" }]],
+    ["arse", [{ word: "butt" }, { word: "backside" }, { word: "arse" }]],
+    ["bottom", [{ word: "butt" }, { word: "backside" }, { word: "ice cream" }]],
+    ["boob", [{ word: "butt" }, { word: "bosom" }]],
+  ]);
+  assert.deepEqual(rankRelated(results, { skipFrom: new Set(["bosom"]) }), [
+    { word: "butt", seeds: ["bum", "arse", "bottom", "boob"] },
+    { word: "backside", seeds: ["bum", "arse", "bottom"] },
+  ]);
+  assert.deepEqual(
+    rankRelated(results, { minSeeds: 1 }).map((hit) => hit.word),
+    ["butt", "backside", "bosom", "hobo"],
   );
 });

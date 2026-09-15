@@ -68,9 +68,10 @@ The CLI enables every layer and uses chaos `0.7` unless `CHAOS` is set.
 npm run eval            # coverage, jackpot and untouched-word report over sample texts
 npm run suggest         # dictionary words one letter from a punchline (offline, /usr/share/dict/words)
 npm run suggest:sounds  # common words that sound like a punchline, ranked by frequency (Datamuse API)
+npm run suggest:related # new punchline ideas: words related to several punchlines (Related Words + Datamuse)
 ```
 
-Suggestions are a starting point, not data: pick the ones that read as a joke in a sentence. The tests reject hyphen-only swaps that do not change how a word sounds, and inflected rules whose base form has no rule.
+Add a good `suggest:related` word to `companyPunchlines`, then `suggest:sounds` finds innocent words that sound like it. Suggestions are a starting point, not data: pick the ones that read as a joke in a sentence. The tests reject hyphen-only swaps that do not change how a word sounds, and inflected rules whose base form has no rule.
 
 ## Limitations
 

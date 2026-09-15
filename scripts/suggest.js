@@ -4,11 +4,14 @@
  *
  *   npm run suggest          dictionary words one letter away (offline)
  *   npm run suggest:sounds   common words that sound alike, via the Datamuse API (online)
+ *   npm run suggest:related  new punchlines related to several known ones, via Related Words and
+ *                            Datamuse (online)
  */
 import { readFileSync } from "node:fs";
 import { crabtreeify } from "../src/lib/crabtreeify.js";
 import {
   companyPunchlines,
+  rankRelated,
   rankSoundAlikes,
   suggestFromTargets,
 } from "../src/lib/rules/candidates.js";
@@ -64,5 +67,28 @@ async function printSoundAlikes() {
   }
 }
 
+async function fetchJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`${new URL(url).host} returned ${response.status}`);
+  return response.json();
+}
+
+async function printRelated() {
+  const known = new Set([...skipFrom, ...companyPunchlines, ...targets]);
+  const resultsBySeed = new Map();
+  for (const punchline of companyPunchlines) {
+    const term = encodeURIComponent(punchline);
+    const [related, meansLike] = await Promise.all([
+      fetchJson(`https://relatedwords.org/api/related?term=${term}`),
+      fetchJson(`https://api.datamuse.com/words?ml=${term}&max=100`),
+    ]);
+    resultsBySeed.set(punchline, [...related, ...meansLike]);
+  }
+  for (const hit of rankRelated(resultsBySeed, { skipFrom: known })) {
+    console.log(`${hit.word}  (${hit.seeds.length}: ${hit.seeds.join(", ")})`);
+  }
+}
+
 if (process.argv.includes("--sounds-like")) await printSoundAlikes();
+else if (process.argv.includes("--related")) await printRelated();
 else printOneLetterAway();

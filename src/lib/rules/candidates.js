@@ -103,3 +103,28 @@ export function rankSoundAlikes(punchline, results, options = {}) {
   }
   return hits.sort((a, b) => b.frequency - a.frequency || a.from.localeCompare(b.from));
 }
+
+/**
+ * Merge related-word lookups for many punchlines and rank the words that come back for the most
+ * of them: a word related to "bum", "arse" and "bottom" is likely a punchline of its own.
+ * @param {Map<string, { word: string }[]>} resultsBySeed related words for each punchline
+ * @param {{ skipFrom?: Set<string>, minSeeds?: number }} [options]
+ */
+export function rankRelated(resultsBySeed, options = {}) {
+  const skipFrom = options.skipFrom ?? new Set();
+  const minSeeds = options.minSeeds ?? 2;
+  const seedsOf = new Map();
+  for (const [seed, results] of resultsBySeed) {
+    for (const { word } of results) {
+      const lower = word.toLowerCase();
+      if (!/^[a-z]{3,}$/.test(lower) || lower === seed) continue;
+      if (STOPWORDS.has(lower) || skipFrom.has(lower)) continue;
+      if (!seedsOf.has(lower)) seedsOf.set(lower, new Set());
+      seedsOf.get(lower).add(seed);
+    }
+  }
+  return [...seedsOf]
+    .map(([word, seeds]) => ({ word, seeds: [...seeds] }))
+    .filter((hit) => hit.seeds.length >= minSeeds)
+    .sort((a, b) => b.seeds.length - a.seeds.length || a.word.localeCompare(b.word));
+}
