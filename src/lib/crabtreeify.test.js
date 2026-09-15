@@ -370,3 +370,25 @@ test("sound-alike punchlines land in ordinary prose", () => {
     "Stop shagging and shitting in the bonk.",
   );
 });
+
+test("related-word punchlines land in ordinary prose", () => {
+  assert.equal(
+    convert("The funny planner found a brick in the salmon at the third burger.", 0.15, ["silly"]),
+    "The fanny plonker found a prick in the semen at the turd booger.",
+  );
+});
+
+test("weird words swap plain words for funny synonyms", () => {
+  assert.equal(
+    convert("Grab your umbrella; the gadgets caused a commotion and I ran away.", 0.15, ["weird"]),
+    "Grab your bumbershoot; the doohickeys caused a hullabaloo and I skedaddled.",
+  );
+  // Everyday words wait for more chaos.
+  assert.equal(convert("What a fuss.", 0.15, ["weird"]), "What a fuss.");
+  assert.equal(convert("What a fuss.", 0.5, ["weird"]), "What a kerfuffle.");
+});
+
+test("a consonant-y replacement takes -ied and a hissing one takes -es", () => {
+  assert.equal(convert("She dawdled.", 0.15, ["weird"]), "She dillydallied.");
+  assert.equal(convert("Two fallacies.", 0.15, ["silly"]), "Two phalluses.");
+});

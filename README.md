@@ -16,6 +16,7 @@ Everything runs in your browser. Text never leaves the page, and share links kee
 | Chaos 0.35, original + silly | Please reset your password and check the pie chart in the context menu.                           | Ploose reset your pissward and check the pie fart in the cocktext menu.                               |
 | Chaos 0.35, original + silly | The competent mentor was beaming at the cinema after his annual bonus.                            | The impotent manure was bumming at the enema after his anal penis.                                    |
 | Chaos 0.5, original + silly  | Upgraded detectors now generate petabytes of data annually, and manual analysis cannot keep pace. | Upbraided defectors now genitrate peterbytes of dater anally, and manure anal-ysis cannot keep paste. |
+| Chaos 0.5, weird only        | Grab your umbrella; the gadgets caused a commotion and I ran away.                                | Grab your bumbershoot; the doohickeys caused a hullabaloo and I skedaddled.                           |
 | Chaos 1, all layers          | Good morning. The report from the committee was late, so the meeting was postponed.               | Good moaning. The riport from the cammittee was loot, so the meating was pastponed.                   |
 
 ## How it works
@@ -24,7 +25,8 @@ The engine (`src/lib/crabtreeify.js`) splits text into words and separators, the
 
 1. **Original Crabtree** (`src/lib/rules/canonical.js`) — documented swaps and whole quotes from the show (`good morning` → `good moaning`, `passing` → `pissing`). Applies at every chaos level, and a matched quote locks the whole line.
 2. **Silly substitutions** (`src/lib/rules/silly.js`, `malaprop.js`) — malapropisms that land on a different, ruder word (`source` → `sauce`, `direction` → `erection`), unlocked in bands as chaos passes 0.15, 0.45 and 0.8.
-3. **Vowel mangling** (`src/lib/vowels.js`) — a generative catch-all for whatever is left. It nudges one vowel group towards Crabtree's favourite vowels and prefers any swap that lands on a jackpot word from `src/lib/rules/targets.js` (`pass` → `piss`, `baby` → `booby`). Chaos sets how many words it touches, and names are spared until full chaos.
+3. **Weird words** (`src/lib/rules/weird.js`) — funny-sounding synonyms that are not rude at all (`umbrella` → `bumbershoot`, `fuss` → `kerfuffle`, `ran away` → `skedaddled`). Rarer words swap from chaos 0.15, everyday ones from 0.45.
+4. **Vowel mangling** (`src/lib/vowels.js`) — a generative catch-all for whatever is left. It nudges one vowel group towards Crabtree's favourite vowels and prefers any swap that lands on a jackpot word from `src/lib/rules/targets.js` (`pass` → `piss`, `baby` → `booby`). Chaos sets how many words it touches, and names are spared until full chaos.
 
 Rules match whole words and their simple inflections (`src/lib/morphology.js`): `publicly` → `pubicly`, `banking` → `bonking`, `dropped` → `dripped`, with the result spelled like English (`knobbing`, `manured`, `willies`). The original word's capitalisation is kept.
 
@@ -81,7 +83,8 @@ Suggestions are a starting point, not data: pick the ones that read as a joke in
 ## Credits
 
 - Officer Crabtree was played by Arthur Bostrom in the BBC sitcom _'Allo 'Allo!_ (1982–1992). The original swaps and quotes were collected from Wikipedia, the _'Allo 'Allo!_ Fandom wiki and IMDb. This is an unofficial fan parody, not affiliated with the BBC or the show's makers.
-- Some silly substitutions and jackpot words were found with the [Datamuse API](https://www.datamuse.com/api/).
+- Some silly substitutions and jackpot words were found with the [Datamuse API](https://www.datamuse.com/api/) and [Related Words](https://relatedwords.org/).
+- Weird words come from the funny-word lists at [Busuu](https://www.busuu.com/en/english/funny-words) and [Parade](https://parade.com/1195613/marynliles/funny-words/).
 - Built with [Svelte 5](https://svelte.dev/), [Vite](https://vite.dev/) and [Tailwind CSS](https://tailwindcss.com/).
 
 ## License

@@ -11,14 +11,18 @@ const LETTERS = "abcdefghijklmnopqrstuvwxyz";
 /** Punchlines you would not put in a company memo. */
 // prettier-ignore
 export const companyPunchlines = [
-  "anal", "arse", "balls", "bastard", "bitch", "bloody", "boob", "boobs",
-  "booby", "bollocks", "bonk", "bosom", "bottom", "bowel", "breast", "bugger",
-  "bum", "cock", "colon", "crap", "crotch", "cunt", "dick", "dung", "enema",
-  "erection", "fart", "groin", "hump", "impotent", "knicker", "knob", "knocker",
-  "loo", "manure", "moan", "nappy", "nipple", "orgasm", "pecker", "penis",
-  "piddle", "piss", "pong", "poo", "poop", "potty", "pubic", "sewage", "shag",
-  "shat", "shit", "snog", "snot", "suck", "tit", "tits", "turd", "wank", "wee",
-  "whore", "willy",
+  "anal", "anus", "arse", "balls", "bastard", "bitch", "bloody", "bollocks", "bonce",
+  "boner", "bonk", "boob", "boobs", "booby", "booger", "bosom", "bottom", "bowel",
+  "breast", "bugger", "bum", "butt", "cock", "colon", "crap", "crapper", "crotch",
+  "cunt", "dick", "dong", "dork", "dribble", "drool", "dung", "enema",
+  "erection", "fanny", "fart", "floozy", "fondle", "gob", "gonad", "groin", "grope",
+  "heinie", "hiccup", "hooter", "horny", "hump", "impotent", "knicker", "knob",
+  "knocker", "loin", "loo", "manky", "manure", "minging", "moan", "nad", "nappy",
+  "nipple", "numpty", "orgasm", "pecker", "penis", "perv", "phallus", "piddle",
+  "pillock", "pimple", "piss", "pong", "poo", "poop", "potty", "prick", "pube", "pubic",
+  "randy", "semen", "sewage", "shag", "shat", "shit", "shite", "slobber", "snog",
+  "snot", "strumpet", "suck", "thong", "tit", "tits", "tosspot", "tummy", "turd",
+  "tush", "twat", "vomit", "wally", "wank", "wee", "whore", "wiener", "willy",
 ];
 
 function edits(word) {

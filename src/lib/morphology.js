@@ -59,11 +59,14 @@ const VOWEL_SUFFIXES = new Set(["ing", "ed", "er", "ers"]);
  */
 export function inflect(to, suffix) {
   if (suffix === "ies") {
-    return to.endsWith("y") ? `${to.slice(0, -1)}ies` : `${to}s`;
+    if (to.endsWith("y")) return `${to.slice(0, -1)}ies`;
+    return /(s|x|z|ch|sh)$/.test(to) ? `${to}es` : `${to}s`;
   }
   if (VOWEL_SUFFIXES.has(suffix)) {
     if (to.endsWith("ee")) return suffix === "ing" ? `${to}ing` : to + suffix.slice(1);
     if (to.endsWith("e")) return to.slice(0, -1) + suffix;
+    // "dillydally" + ed is "dillydallied", but + ing keeps its y.
+    if (suffix !== "ing" && /[^aeiou]y$/.test(to)) return `${to.slice(0, -1)}i${suffix}`;
     // A one-syllable ending of consonant, vowel, consonant doubles: "re-shit" -> "re-shitting".
     const lastPart = to.split(/[- ]/).at(-1);
     if (/^[^aeiouy]*[aeiou][^aeiouwxy]$/.test(lastPart)) return to + to.at(-1) + suffix;

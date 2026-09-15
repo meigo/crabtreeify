@@ -79,6 +79,16 @@ const seeds = [
   "knocker", "knockers", "piddle", "piddles", "boob", "boobs", "booby", "boobies",
   "pecker", "peckers", "hump", "humps", "breast", "breasts",
 
+  // found by running the existing words through relatedwords.org and Datamuse
+  "anus", "boner", "boners", "bollock", "booger", "boogers", "bonce", "butt", "butts",
+  "crapper", "crappers", "dong", "dongs", "dork", "dorks", "dribble", "drool",
+  "fanny", "fannies", "floozy", "fondle", "gob", "gonad", "gonads", "grope", "gropes",
+  "heinie", "hiccup", "hooter", "hooters", "horny", "loin", "manky", "minging", "nad",
+  "nads", "numpty", "perv", "pervs", "phallus", "pillock", "pillocks", "pimple", "pimples",
+  "prick", "pricks", "pube", "pubes", "randy", "semen", "shite", "slobber", "strumpet",
+  "strumpets", "thong", "thongs", "tosspot", "tosspots", "tummy", "tummies", "tush", "twat",
+  "vomit", "wally", "wallies", "wiener", "wieners",
+
   // words worth exposing with a well-placed hyphen
   "suck", "sucks", "sucking", "meat", "meats", "bass", "dick", "dicks",
   "tickle", "tickles", "mint", "mints", "once",

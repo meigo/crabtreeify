@@ -1,5 +1,6 @@
 import canonical from "./canonical.js";
 import silly from "./silly.js";
+import weird from "./weird.js";
 
 /**
  * Generative catch-all, applied after the curated layers so their better
@@ -14,7 +15,7 @@ const vowels = {
   generative: true,
 };
 
-export const layers = [canonical, silly, vowels];
+export const layers = [canonical, silly, weird, vowels];
 
 export const sampleText =
   "Good morning. Please reset your password and check the pie chart in the context menu. I was passing by the door when I heard two shots. You are holding in your hand a smoking gun; you are clearly the guilty party. Do not worry.";
