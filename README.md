@@ -8,6 +8,8 @@ Turn plain English into Officer Crabtree nonsense from _'Allo 'Allo!_, the under
 
 Everything runs in your browser. Text never leaves the page, and share links keep their settings in the URL hash, which browsers do not send to servers.
 
+The output can cross the line of good taste. Silly substitutions swap innocent words for rude, sexual or scatological ones, and they get ruder as chaos rises. Turn that layer off if you only want the show's own malapropisms and the weird-word synonyms.
+
 ## Examples
 
 | Settings                     | Plain English                                                                                     | Crabtree                                                                                              |
