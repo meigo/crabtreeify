@@ -20,6 +20,7 @@
   let enabledLayers = $state(parseLayersParam(params.get("layers")));
   let copied = $state(false);
   let shared = $state(false);
+  let status = $state("");
 
   function enabledNames() {
     return layerList.map((l) => l.name).filter((name) => enabledLayers[name]);
@@ -57,12 +58,30 @@
     input = sampleText;
   }
 
+  async function writeClipboard(text, successMessage, failureMessage) {
+    status = "";
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard API unavailable");
+      await navigator.clipboard.writeText(text);
+      status = successMessage;
+      return true;
+    } catch {
+      status = failureMessage;
+      return false;
+    }
+  }
+
   async function copyOutput() {
-    await navigator.clipboard.writeText(result.text);
-    copied = true;
-    setTimeout(() => {
-      copied = false;
-    }, 1200);
+    copied = await writeClipboard(
+      result.text,
+      "Output copied.",
+      "Copy failed. Select the output and copy it manually.",
+    );
+    if (copied) {
+      setTimeout(() => {
+        copied = false;
+      }, 1200);
+    }
   }
 
   async function copyShareLink() {
@@ -156,7 +175,7 @@
         <button type="button" onclick={copyOutput}>{copied ? "Copied" : "Copy"}</button>
       </div>
     </div>
-    <div class="output" aria-live="polite">
+    <div class="output">
       {#if result.text}
         {#each result.parts as part}
           {#if part.changed}
@@ -169,6 +188,7 @@
         <span class="text-muted">Good moaning...</span>
       {/if}
     </div>
+    <p class="sr-only" role="status" aria-live="polite">{#if status}{status}{/if}</p>
     {#if result.changeCount}
       <p class="mt-2 text-xs text-muted">Hover a highlighted word to see the original.</p>
     {/if}
