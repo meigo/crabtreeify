@@ -254,7 +254,6 @@ function applyLayer(tokens, layer, intensity) {
     applyGenerative(tokens, intensity);
     return;
   }
-  applyPhrases(tokens, layer.phrases, intensity);
   applyWholeWords(tokens, layer.wholeWords, intensity);
 }
 
@@ -289,6 +288,11 @@ export function crabtreeifyDetailed(text, layers, options = {}) {
     return enabledNames.includes(layer.meta.name);
   });
 
+  // Phrases from every layer go first: a multi-word joke beats a single-word swap, even one from an
+  // earlier layer ("hit and miss" is "shit and piss", not the show's "hot and miss").
+  for (const layer of normalized) {
+    if (!layer.generative) applyPhrases(tokens, layer.phrases, intensity);
+  }
   for (const layer of normalized) {
     applyLayer(tokens, layer, intensity);
   }

@@ -23,7 +23,7 @@ The output can cross the line of good taste. Silly substitutions swap innocent w
 
 ## How it works
 
-The engine (`src/lib/crabtreeify.js`) splits text into words and separators, then runs the enabled layers in order. A layer locks every word it changes, so a later layer can never overwrite a better joke.
+The engine (`src/lib/crabtreeify.js`) splits text into words and separators, then runs the enabled layers in order. A layer locks every word it changes, so a later layer can never overwrite a better joke. Phrases are the exception: every enabled layer's phrases run before any single-word swap, because a multi-word joke is more specific (`hit and miss` → `shit and piss`, even though the show layer turns `hit` into `hot`).
 
 1. **Original Crabtree** (`src/lib/rules/canonical.js`) — documented swaps and whole quotes from the show (`good morning` → `good moaning`, `passing` → `pissing`). Applies at every chaos level, and a matched quote locks the whole line.
 2. **Silly substitutions** (`src/lib/rules/silly.js`, `malaprop.js`) — malapropisms that land on a different, ruder word (`source` → `sauce`, `direction` → `erection`), unlocked in bands as chaos passes 0.15, 0.45 and 0.8.

@@ -401,8 +401,11 @@ export const core = {
     twist: "twit",
     visit: "vomit",
     wing: "wang",
+    "hit-and-miss": "shit-and-piss",
   },
   phrases: [
+    { from: "hit and miss", to: "shit and piss", priority: 80 },
+    { from: "hit or miss", to: "shit or piss", priority: 80 },
     { from: "keep pace", to: "keep paste", priority: 70 },
     { from: "per second", to: "per sexond", priority: 70 },
     { from: "neutron source", to: "newton sauce", priority: 80 },

@@ -402,3 +402,13 @@ test("a consonant-y replacement takes -ied and a hissing one takes -es", () => {
   assert.equal(convert("She dawdled.", 0.15, ["weird"]), "She dillydallied.");
   assert.equal(convert("Two fallacies.", 0.15, ["silly"]), "Two phalluses.");
 });
+
+test("a phrase from a later layer beats a single-word swap from an earlier one", () => {
+  const withSilly = (text) => convert(text, 0.15, ["canonical", "silly"]);
+  assert.equal(withSilly("It was hit and miss."), "It was shit and piss.");
+  assert.equal(withSilly("Hit or miss."), "Shit or piss.");
+  assert.equal(withSilly("It was hit-and-miss."), "It was shit-and-piss.");
+  // The show's own words and phrases still win everywhere else.
+  assert.equal(withSilly("I hit the ball."), "I hot the ball.");
+  assert.equal(withSilly("A direct hit."), "A direct hot.");
+});
