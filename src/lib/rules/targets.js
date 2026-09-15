@@ -21,7 +21,7 @@ const seeds = [
   "snog", "snogs", "snogged",
   "pong", "pongs", "pongy",
   "whiff", "whiffs", "whiffy",
-  "nipple", "nipples", "nipples",
+  "nipple", "nipples",
   "bugger", "buggers", "buggered",
   "crap", "craps", "crapped",
   "sod", "sods", "sodded",
@@ -55,10 +55,10 @@ const seeds = [
   "bladder", "bladders", "gizzard", "gizzards", "gullet", "gullets",
   "trotter", "trotters", "haunch", "haunches", "rump", "rumps",
   "udder", "udders", "teat", "teats", "snout", "snouts",
-  "wart", "hog", "hogs", "sow", "sows", "boar", "boars",
+  "hog", "hogs", "sow", "sows", "boar", "boars",
   "stool", "stools", "commode", "chamberpot",
   "corgi", "corgis", "spaniel", "ferret", "ferrets", "weasel", "weasels",
-  "mucus", "pus", "scab", "scabs", "boils", "blister", "blisters",
+  "mucus", "pus", "scab", "scabs", "blister", "blisters",
   "whore", "whores", "harlot", "harlots", "hussy", "trollop",
   "codpiece", "bloomers",
   "chops", "oggs", "fosh", "frigs",
@@ -77,7 +77,7 @@ const seeds = [
 
   // words worth exposing with a well-placed hyphen
   "suck", "sucks", "sucking", "meat", "meats", "bass", "dick", "dicks",
-  "poop", "tickle", "tickles", "mint", "mints", "once",
+  "tickle", "tickles", "mint", "mints", "once",
 ];
 
 export const targets = new Set(seeds);

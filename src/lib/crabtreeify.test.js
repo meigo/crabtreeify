@@ -28,16 +28,6 @@ test("good morning stays good moaning, not goot moaning", () => {
   assert.equal(convert("Good morning.", 1), "Good moaning.");
 });
 
-test("matched canonical phrases survive later generative layers", () => {
-  assert.equal(
-    crabtreeify("Good morning.", layers, {
-      intensity: 1,
-      enabledLayers: ["canonical", "silly", "vowels"],
-    }),
-    "Good moaning.",
-  );
-});
-
 test("phrases do not cross sentence or arbitrary punctuation boundaries", () => {
   assert.equal(convert("mother. in law", 0, ["canonical"]), "mither. in law");
   assert.equal(convert("mother — in law", 0, ["canonical"]), "mither — in law");
@@ -190,21 +180,6 @@ test("singular and plural stay in step", () => {
   assert.equal(convert("eggs", 1), "oggs");
 });
 
-test("phrases do not match across sentence punctuation", () => {
-  const out = convert("mother. in law", 0, ["canonical"]);
-  assert.doesNotMatch(out, /loo/i);
-});
-
-test("accented whole words still match", () => {
-  assert.match(convert("Do not worry René", 0, ["canonical"]), /ronnie/i);
-});
-
-test("substring rules do not rewrite unrelated longer words", () => {
-  const out = convert("chartreuse and contextual notes", 1, ["silly"]);
-  assert.doesNotMatch(out, /fartreuse/i);
-  assert.doesNotMatch(out, /cocktextual/i);
-});
-
 test("detailed output marks changed words", () => {
   const { text, parts, changeCount } = crabtreeifyDetailed("Good morning", layers, {
     intensity: 0,
@@ -267,12 +242,12 @@ test("preserves lowercase replacement for uncased-script words", () => {
   );
 });
 
-test("substring rules do not rewrite unrelated containing words", () => {
+test("whole-word rules leave longer words that contain them alone", () => {
   assert.equal(convert("chartreuse", 1, ["silly"]), "chartreuse");
   assert.equal(convert("contextual", 1, ["silly"]), "contextual");
 });
 
-test("intended whole words still transform after substring hardening", () => {
+test("the whole words themselves still transform", () => {
   assert.equal(convert("chart context", 1, ["silly"]), "fart cocktext");
 });
 

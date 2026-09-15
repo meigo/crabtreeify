@@ -172,7 +172,6 @@ export default {
     { from: "good evening", to: "good moaning", priority: 390 },
     { from: "good night", to: "good moaning", priority: 390 },
     { from: "god morning", to: "good moaning", priority: 390 },
-    { from: "god moaning", to: "good moaning", priority: 390 },
 
     {
       from: "i was passing by the door, and i thought i would drop in",
@@ -265,16 +264,8 @@ export default {
       priority: 360,
     },
     { from: "heil hitler", to: "hole hotler", priority: 360 },
-    { from: "hole hitler", to: "hole hotler", priority: 360 },
     { from: "herr flick", to: "herr flock", priority: 360 },
     { from: "von smallhausen", to: "von smellhorsen", priority: 360 },
-    { from: "good moaning herr flick", to: "good moaning herr flock", priority: 360 },
-    { from: "good moaning, herr flick", to: "good moaning, herr flock", priority: 360 },
-    {
-      from: "good moaning herr flick and von smallhausen",
-      to: "good moaning herr flock and von smellhorsen",
-      priority: 365,
-    },
     { from: "see naples and die", to: "see nipples and do", priority: 360 },
     { from: "as they say see naples and die", to: "as they say see nipples and do", priority: 360 },
     { from: "i was raised in naples", to: "i was raised in nipples", priority: 360 },
