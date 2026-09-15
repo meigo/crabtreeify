@@ -21,7 +21,7 @@ function preserveCase(original, replacement) {
   if (original === original.toUpperCase() && [...original].some(isCasedLetter)) {
     return replacement.toUpperCase();
   }
-  const first = original[0];
+  const first = [...original][0];
   if (first === first.toUpperCase() && isCasedLetter(first)) {
     return replacement[0].toUpperCase() + replacement.slice(1);
   }

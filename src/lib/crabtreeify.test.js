@@ -170,6 +170,20 @@ test("preserves initial capitalization on accented words", () => {
   );
 });
 
+test("preserves initial capitalization on supplementary-plane words", () => {
+  const layer = {
+    meta: { name: "deseret-case", label: "Deseret Case" },
+    wholeWords: {
+      "𐐨foo": "replacement",
+    },
+  };
+
+  assert.equal(
+    crabtreeify("𐐀foo", [layer], { intensity: 0, enabledLayers: ["deseret-case"] }),
+    "Replacement",
+  );
+});
+
 test("preserves lowercase replacement for uncased-script words", () => {
   const layer = {
     meta: { name: "uncased-script", label: "Uncased Script" },
