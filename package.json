@@ -1,6 +1,12 @@
 {
   "name": "crabtreeify",
   "version": "0.2.0",
+  "description": "Turn plain English into Officer Crabtree malapropisms from 'Allo 'Allo!",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meigo/crabtreeify.git"
+  },
   "private": true,
   "type": "module",
   "scripts": {
