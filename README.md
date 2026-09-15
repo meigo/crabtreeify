@@ -81,7 +81,7 @@ Add a good `suggest:related` word to `companyPunchlines`, then `suggest:sounds` 
 - English only, and the rules are hand-curated, so plenty of words stay untouched below full chaos.
 - Phrase matches do not cross sentence-ending punctuation. Rules match whole words and their simple inflections, so `chartreuse` is left alone.
 - Inflection is heuristic; rare forms can come out odd (`tightly` → `titly`).
-- Stress data lines up syllables with spelled vowels only roughly, so a few words still change an unstressed vowel (`reality` → `realoty`). The data also adds about 110 KB gzipped to the page.
+- Stress data lines up syllables with spelled vowels only roughly, so a few words still change an unstressed vowel (`reality` → `realoty`). The data (about 110 KB gzipped) loads after the page has rendered, so the first output briefly goes by spelling alone.
 - Vowel mangling only touches plain ASCII words. Accented words change only through explicit rules (`René` → `Ronnie`).
 - Very long input is left out of share links.
 

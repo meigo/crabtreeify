@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { vowelSwap } from "./vowels.js";
+import { loadStress } from "./stress.js";
+
+await loadStress();
 
 test("swaps a vowel to Crabtree's favourite o", () => {
   assert.equal(vowelSwap("fish"), "fosh");

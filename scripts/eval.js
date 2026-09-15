@@ -11,6 +11,9 @@ import { crabtreeifyDetailed } from "../src/lib/crabtreeify.js";
 import { layers } from "../src/lib/rules/index.js";
 import { targets } from "../src/lib/rules/targets.js";
 import { findWeakPairs } from "../src/lib/rules/quality.js";
+import { loadStress } from "../src/lib/stress.js";
+
+await loadStress();
 
 const CORPUS = {
   show: "Good morning. I was passing by the door, when I heard two shots. You are holding in your hand a smoking gun; you are clearly the guilty party.",

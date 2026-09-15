@@ -1,5 +1,7 @@
 <script>
+  import { onMount } from "svelte";
   import { crabtreeifyDetailed, normalizeIntensity } from "./lib/crabtreeify.js";
+  import { loadStress } from "./lib/stress.js";
   import { layers, sampleText, canonicalQuotes } from "./lib/rules/index.js";
   import {
     SHARE_TEXT_LIMIT,
@@ -33,9 +35,19 @@
     return layerList.map((l) => l.name).filter((name) => enabledLayers[name]);
   }
 
-  let result = $derived(
-    crabtreeifyDetailed(input, layers, { intensity, enabledLayers: enabledNames() }),
-  );
+  // Stress data is fetched after the first render. Until it lands, or if it never does, vowel
+  // mangling goes by spelling alone; reading stressLoaded redoes the conversion once it arrives.
+  let stressLoaded = $state(false);
+  onMount(() => {
+    loadStress()
+      .then(() => (stressLoaded = true))
+      .catch(() => {});
+  });
+
+  let result = $derived.by(() => {
+    void stressLoaded;
+    return crabtreeifyDetailed(input, layers, { intensity, enabledLayers: enabledNames() });
+  });
 
   let chaosName = $derived(intensity < 0.2 ? "Canonical" : intensity < 0.9 ? "Officer" : "Bonkers");
 
