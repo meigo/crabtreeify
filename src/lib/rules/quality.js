@@ -1,4 +1,5 @@
 import { normalizeLayer } from "../crabtreeify.js";
+import { stemsOf } from "../morphology.js";
 import { targets } from "./targets.js";
 
 /**
@@ -59,30 +60,6 @@ export function isWeakPair(from, to) {
   return editDistanceAtMost1(phoneticKey(flattened), phoneticKey(from));
 }
 
-/** Mirror of the engine's stemmer: which base words would reach this key? */
-function basesOf(word) {
-  const out = [];
-  if (word.length > 6 && word.endsWith("ing")) {
-    out.push({ base: word.slice(0, -3), suffix: "ing" });
-    out.push({ base: `${word.slice(0, -3)}e`, suffix: "ing" });
-  }
-  if (word.length > 6 && word.endsWith("ly")) out.push({ base: word.slice(0, -2), suffix: "ly" });
-  if (word.length > 6 && word.endsWith("ers")) out.push({ base: word.slice(0, -3), suffix: "ers" });
-  if (word.length > 6 && word.endsWith("er")) out.push({ base: word.slice(0, -2), suffix: "er" });
-  if (word.length > 5 && word.endsWith("ies")) {
-    out.push({ base: `${word.slice(0, -3)}y`, suffix: "ies" });
-  }
-  if (word.length > 4 && word.endsWith("es")) out.push({ base: word.slice(0, -2), suffix: "es" });
-  if (word.length > 3 && word.endsWith("s") && !word.endsWith("ss")) {
-    out.push({ base: word.slice(0, -1), suffix: "s" });
-  }
-  if (word.length > 5 && word.endsWith("ed")) {
-    out.push({ base: word.slice(0, -2), suffix: "ed" });
-    out.push({ base: `${word.slice(0, -2)}e`, suffix: "ed" });
-  }
-  return out;
-}
-
 function curatedDict(layers) {
   const dict = {};
   const graded = new Set();
@@ -108,7 +85,7 @@ export function findLonelyInflections(layers, isWord) {
 
   for (const from of graded) {
     const to = dict[from];
-    for (const { base, suffix } of basesOf(from)) {
+    for (const { stem: base, suffix } of stemsOf(from)) {
       if (base.length < 3 || !isWord(base)) continue;
       if (from !== base + suffix && !from.endsWith(suffix)) continue;
 

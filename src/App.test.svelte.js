@@ -37,3 +37,14 @@ test("announces clipboard failure without claiming success", async () => {
   );
   expect(screen.getByRole("button", { name: "Copy" })).toBeInTheDocument();
 });
+
+test("restores chaos from a share link", () => {
+  history.replaceState(null, "", "/#chaos=0.8");
+  render(App);
+  expect(screen.getByLabelText("Chaos").value).toBe("0.8");
+});
+
+test("starts at the default chaos when the link has none", () => {
+  render(App);
+  expect(screen.getByLabelText("Chaos").value).toBe("0.35");
+});

@@ -1,5 +1,5 @@
 <script>
-  import { crabtreeifyDetailed } from "./lib/crabtreeify.js";
+  import { crabtreeifyDetailed, normalizeIntensity } from "./lib/crabtreeify.js";
   import { layers, sampleText, canonicalQuotes } from "./lib/rules/index.js";
   import {
     SHARE_TEXT_LIMIT,
@@ -22,7 +22,7 @@
   ];
 
   let input = $state(params.get("text") || sampleText);
-  let intensity = $state(clampChaos(params.get("chaos")));
+  let intensity = $state(normalizeIntensity(params.get("chaos"), 0.35));
   const enabledLayers = $state(parseLayersParam(params.get("layers")));
   let copied = $state(false);
   let shared = $state(false);
@@ -40,12 +40,6 @@
   let chaosName = $derived(intensity < 0.2 ? "Canonical" : intensity < 0.9 ? "Officer" : "Bonkers");
 
   let shareTooLong = $derived(input.length > SHARE_TEXT_LIMIT);
-
-  function clampChaos(value) {
-    const n = Number(value);
-    if (Number.isNaN(n)) return 0.35;
-    return Math.min(1, Math.max(0, n));
-  }
 
   function parseLayersParam(value) {
     if (!value) return Object.fromEntries(layerList.map((l) => [l.name, true]));

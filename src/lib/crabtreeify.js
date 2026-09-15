@@ -1,10 +1,11 @@
+import { inflect, stemsOf } from "./morphology.js";
 import { vowelSwap } from "./vowels.js";
 
 export const DEFAULT_INTENSITY = 0.7;
 
-function normalizeIntensity(value) {
-  const numeric = Number(value ?? DEFAULT_INTENSITY);
-  if (!Number.isFinite(numeric)) return DEFAULT_INTENSITY;
+export function normalizeIntensity(value, fallback = DEFAULT_INTENSITY) {
+  const numeric = Number(value ?? fallback);
+  if (!Number.isFinite(numeric)) return fallback;
   return Math.min(1, Math.max(0, numeric));
 }
 
@@ -101,54 +102,6 @@ function sortSubstrings(rules) {
   });
 }
 
-function stemsOf(word) {
-  const out = [];
-  if (word.length > 6 && word.endsWith("ing")) {
-    out.push({ stem: word.slice(0, -3), suffix: "ing" });
-    out.push({ stem: `${word.slice(0, -3)}e`, suffix: "ing" });
-  }
-  if (word.length > 6 && word.endsWith("ly")) {
-    out.push({ stem: word.slice(0, -2), suffix: "ly" });
-  }
-  if (word.length > 6 && word.endsWith("ers")) {
-    out.push({ stem: word.slice(0, -3), suffix: "ers" });
-  }
-  if (word.length > 6 && word.endsWith("er")) {
-    out.push({ stem: word.slice(0, -2), suffix: "er" });
-  }
-  if (word.length > 5 && word.endsWith("ies")) {
-    out.push({ stem: `${word.slice(0, -3)}y`, suffix: "ies" });
-  }
-  if (word.length > 4 && word.endsWith("es")) {
-    out.push({ stem: word.slice(0, -2), suffix: "es" });
-  }
-  if (word.length > 3 && word.endsWith("s") && !word.endsWith("ss")) {
-    out.push({ stem: word.slice(0, -1), suffix: "s" });
-  }
-  if (word.length > 5 && word.endsWith("ed")) {
-    out.push({ stem: word.slice(0, -2), suffix: "ed" });
-    out.push({ stem: `${word.slice(0, -2)}e`, suffix: "ed" });
-  }
-  return out;
-}
-
-/**
- * Glue a suffix onto a replacement the way English would, so "safety" ->
- * "sassiety" gives "sassieties" rather than "sassietyies".
- */
-function inflect(to, suffix, stem) {
-  if (suffix === "ies") {
-    return to.endsWith("y") ? `${to.slice(0, -1)}ies` : `${to}s`;
-  }
-  if ((suffix === "ing" || suffix === "ed") && stem.endsWith("e") && to.endsWith("e")) {
-    return to.slice(0, -1) + suffix;
-  }
-  const hisses = /(s|x|z|ch|sh)$/.test(to);
-  if (suffix === "s" && hisses) return `${to}es`;
-  if (suffix === "es" && !hisses) return `${to}s`;
-  return to + suffix;
-}
-
 function lookupWholeWord(core, dict) {
   const lower = core.toLowerCase();
   if (dict[lower]) return { ...dict[lower], text: dict[lower].to };
@@ -216,6 +169,10 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
 
   if (fromWords.length > toWords.length) {
     for (let i = n; i < fromWords.length; i += 1) {
+      // Drop the separator in front of each dropped word too, or its space is left behind.
+      if (i > 0) {
+        for (let j = wordIdxs[i - 1] + 1; j < wordIdxs[i]; j += 1) tokens[j].raw = "";
+      }
       tokens[wordIdxs[i]].core = "";
       tokens[wordIdxs[i]].locked = true;
     }
@@ -304,7 +261,8 @@ function applyGenerative(tokens, intensity) {
 
 export function normalizeLayer(layer) {
   const fallback = layer.meta?.alwaysApply || layer.alwaysApply ? 0 : (layer.minChaos ?? 0);
-  const wholeWords = {};
+  // No prototype, so input words like "constructor" can't find Object.prototype members.
+  const wholeWords = Object.create(null);
   for (const [from, value] of Object.entries(layer.wholeWords ?? {})) {
     wholeWords[from.toLowerCase()] = asEntry(value, fallback);
   }

@@ -296,3 +296,28 @@ test("normalizes invalid and out-of-range intensity", () => {
   assert.equal(run(-1), "test");
   assert.equal(run(2), "changed");
 });
+
+test("words named like Object.prototype members are plain words", () => {
+  const text = "constructor constructors __proto__ toString";
+  assert.equal(convert(text, 1), text);
+});
+
+test("-es is only a suffix after a hissing sound", () => {
+  // plane -> plan, so "planes" must not be read as plan + es.
+  assert.equal(convert("planes", 0, ["canonical"]), "plans");
+  // site is not sit + es.
+  assert.equal(convert("sites", 1, ["silly"]), "sites");
+  // batch -> bitch still inflects through a real -es plural.
+  assert.equal(convert("batches", 1, ["silly"]), "bitches");
+});
+
+test("a phrase that drops words leaves no stray whitespace", () => {
+  const layer = {
+    meta: { name: "shrinking", label: "Shrinking" },
+    phrases: [{ from: "alpha beta gamma", to: "one two" }],
+  };
+  const run = (text) => crabtreeify(text, [layer], { intensity: 1, enabledLayers: ["shrinking"] });
+
+  assert.equal(run("Alpha beta gamma."), "One two.");
+  assert.equal(run("Alpha beta gamma delta"), "One two delta");
+});
