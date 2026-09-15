@@ -148,6 +148,14 @@ test("detailed output marks changed words", () => {
   assert.equal(moaning?.from.toLowerCase(), "morning");
 });
 
+test("matches canonical rules containing accented letters", () => {
+  assert.equal(convert("René", 0, ["canonical"]), "Ronnie");
+});
+
+test("preserves unrelated accented words and punctuation", () => {
+  assert.equal(convert("café résumé naïve", 0, ["canonical"]), "café résumé naïve");
+});
+
 test("normalizes invalid and out-of-range intensity", () => {
   const gradedLayer = {
     meta: { name: "graded", label: "Graded" },

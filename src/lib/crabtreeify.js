@@ -23,8 +23,14 @@ function preserveCase(original, replacement) {
   return replacement;
 }
 
+const WORD_SOURCE = String.raw`[\p{L}\p{N}_]+(?:['’\-][\p{L}\p{N}_]+)*`;
+
+function wordRegex() {
+  return new RegExp(WORD_SOURCE, "gu");
+}
+
 function wordsOf(phrase) {
-  return (phrase.toLowerCase().match(/[\w'-]+/g) ?? []);
+  return [...phrase.toLowerCase().matchAll(wordRegex())].map((match) => match[0]);
 }
 
 /** Spread a yes/no decision evenly across words so chaos reads as density. */
@@ -135,20 +141,29 @@ function lookupWholeWord(core, dict) {
 }
 
 function tokenize(text) {
-  return text.split(/(\s+|[^\w\s]+|\w+(?:['-]\w+)*)/g).filter((t) => t !== "").map((raw) => {
-    const match = raw.match(/^([^\w]*)([\w'-]+)([^\w]*)$/);
-    if (!match || !/\w/.test(raw)) {
-      return { kind: "sep", raw };
+  const tokens = [];
+  let cursor = 0;
+
+  for (const match of text.matchAll(wordRegex())) {
+    const index = match.index ?? 0;
+    if (index > cursor) {
+      tokens.push({ kind: "sep", raw: text.slice(cursor, index) });
     }
-    return {
+    tokens.push({
       kind: "word",
-      lead: match[1],
-      core: match[2],
-      originalCore: match[2],
-      trail: match[3],
+      lead: "",
+      core: match[0],
+      originalCore: match[0],
+      trail: "",
       locked: false,
-    };
-  });
+    });
+    cursor = index + match[0].length;
+  }
+
+  if (cursor < text.length) {
+    tokens.push({ kind: "sep", raw: text.slice(cursor) });
+  }
+  return tokens;
 }
 
 function tokenText(token) {
