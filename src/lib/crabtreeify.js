@@ -136,28 +136,42 @@ function applyPhraseAt(tokens, wordIdxs, fromWords, toWords) {
   const fromCores = wordIdxs.map((i) => tokens[i].core);
   const n = Math.min(fromWords.length, toWords.length);
 
+  // Equal lengths keep one highlight per word. An unequal swap zipped by index
+  // leaves a blank word ("ran away" → "skedaddled" + "") and points "dick" at
+  // "distance", so the whole span becomes one part.
+  if (fromWords.length !== toWords.length) {
+    const start = wordIdxs[0];
+    const end = wordIdxs[wordIdxs.length - 1];
+    const originalSpan = tokens
+      .slice(start, end + 1)
+      .map((token) => (token.kind === "word" ? token.originalCore : token.raw))
+      .join("");
+
+    let replacement = "";
+    for (let i = 0; i < n; i += 1) {
+      if (i > 0) replacement += separatorBetween(tokens, wordIdxs[i - 1], wordIdxs[i]);
+      replacement += preserveCase(fromCores[i], toWords[i]);
+    }
+    if (toWords.length > n) {
+      const extra = toWords.slice(n).join(" ");
+      replacement += `${replacement ? " " : ""}${extra}`;
+    }
+
+    const first = tokens[start];
+    first.core = replacement;
+    first.originalCore = originalSpan;
+    first.locked = true;
+    for (let i = start + 1; i <= end; i += 1) {
+      tokens[i].omit = true;
+      if (tokens[i].kind === "word") tokens[i].locked = true;
+    }
+    return;
+  }
+
   for (let i = 0; i < n; i += 1) {
     const token = tokens[wordIdxs[i]];
     token.core = preserveCase(fromCores[i], toWords[i]);
     token.locked = true;
-  }
-
-  if (toWords.length > fromWords.length) {
-    const extra = toWords.slice(fromWords.length).join(" ");
-    const last = tokens[wordIdxs[n - 1]];
-    last.core = `${last.core} ${extra}`;
-    last.locked = true;
-  }
-
-  if (fromWords.length > toWords.length) {
-    for (let i = n; i < fromWords.length; i += 1) {
-      // Drop the separator in front of each dropped word too, or its space is left behind.
-      if (i > 0) {
-        for (let j = wordIdxs[i - 1] + 1; j < wordIdxs[i]; j += 1) tokens[j].raw = "";
-      }
-      tokens[wordIdxs[i]].core = "";
-      tokens[wordIdxs[i]].locked = true;
-    }
   }
 }
 
@@ -203,10 +217,30 @@ function applyWholeWords(tokens, dict, intensity) {
   }
 }
 
+// "e.g." and "U.S." are tokenized as single letters. A period after one of
+// these, or after a title, does not start a new sentence.
+const ABBREVIATIONS = new Set(["mr", "mrs", "ms", "dr", "st"]);
+
+function isAbbreviationOrInitial(core) {
+  const lower = core.toLowerCase();
+  if ([...lower].length === 1 && /\p{L}/u.test(lower)) return true;
+  return ABBREVIATIONS.has(lower);
+}
+
+function separatorEndsSentence(tokens, sepIndex) {
+  const raw = tokens[sepIndex].raw;
+  if (/[!?]/.test(raw)) return true;
+  if (!raw.includes(".")) return false;
+  const prev = sepIndex > 0 ? tokens[sepIndex - 1] : null;
+  const core = prev?.originalCore ?? prev?.core;
+  if (prev?.kind === "word" && core && isAbbreviationOrInitial(core)) return false;
+  return true;
+}
+
 function isSentenceStart(tokens, index) {
   for (let i = index - 1; i >= 0; i -= 1) {
     if (tokens[i].kind === "word") return false;
-    if (/[.!?]/.test(tokens[i].raw)) return true;
+    if (separatorEndsSentence(tokens, i)) return true;
   }
   return true;
 }
@@ -258,12 +292,18 @@ function applyLayer(tokens, layer, intensity) {
 }
 
 function toParts(tokens) {
-  return tokens.map((token) => {
+  const parts = [];
+  for (const token of tokens) {
+    if (token.omit) continue;
     const text = tokenText(token);
-    if (token.kind === "sep") return { text, changed: false, from: text };
+    if (token.kind === "sep") {
+      parts.push({ text, changed: false, from: text });
+      continue;
+    }
     const changed = token.core.toLowerCase() !== token.originalCore.toLowerCase();
-    return { text, changed, from: token.originalCore };
-  });
+    parts.push({ text, changed, from: token.originalCore });
+  }
+  return parts;
 }
 
 const compiledLayers = new WeakMap();

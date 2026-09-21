@@ -50,6 +50,8 @@ const vulgar = group(0.8, {
     off: "oaf",
     far: "fart",
     war: "whore",
+    cent: "cunt",
+    curt: "cunt",
   },
   phrases: [
     { from: "bit set", to: "tit shit", priority: 70 },

@@ -35,6 +35,20 @@ export function stemsOf(word) {
   if (word.length > 5 && word.endsWith("ies")) {
     out.push({ stem: `${word.slice(0, -3)}y`, suffix: "ies" });
   }
+  // "worried" is worry + ed, the same y→i change as "bodies". Otherwise the
+  // base rule never fires and the vowel layer is left to type "warried".
+  if (word.length > 4 && /[^aeiou]ied$/.test(word)) {
+    out.push({ stem: `${word.slice(0, -3)}y`, suffix: "ed" });
+  }
+  if (word.length > 4 && /[^aeiou]ier$/.test(word)) {
+    out.push({ stem: `${word.slice(0, -3)}y`, suffix: "er" });
+  }
+  if (word.length > 5 && /[^aeiou]iest$/.test(word)) {
+    out.push({ stem: `${word.slice(0, -4)}y`, suffix: "est" });
+  }
+  if (word.length > 4 && /[^aeiou]ily$/.test(word)) {
+    out.push({ stem: `${word.slice(0, -3)}y`, suffix: "ly" });
+  }
   // Only after a hissing sound: "batches" is batch + es, but "planes" is plane + s.
   if (word.length > 4 && /(s|x|z|ch|sh)es$/.test(word)) {
     out.push({ stem: word.slice(0, -2), suffix: "es" });
@@ -73,6 +87,10 @@ export function inflect(to, suffix) {
     return to + suffix;
   }
   if (suffix === "s" && /[^aeiou]y$/.test(to)) return `${to.slice(0, -1)}ies`;
+  // "nappy" + ly is "nappily", and + est is "nappiest".
+  if ((suffix === "ly" || suffix === "est") && /[^aeiou]y$/.test(to)) {
+    return `${to.slice(0, -1)}i${suffix}`;
+  }
   const hisses = /(s|x|z|ch|sh)$/.test(to);
   if (suffix === "s" && hisses) return `${to}es`;
   if (suffix === "es" && !hisses) return `${to}s`;

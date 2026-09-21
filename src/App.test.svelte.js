@@ -48,3 +48,39 @@ test("starts at the default chaos when the link has none", () => {
   render(App);
   expect(screen.getByLabelText("Chaos").value).toBe("0.35");
 });
+
+test("a share link with no text or layers still opens the sample", () => {
+  history.replaceState(null, "", "/#chaos=0.35");
+  render(App);
+  expect(screen.getByLabelText("Original").value.length).toBeGreaterThan(0);
+  for (const box of screen.getAllByRole("checkbox")) expect(box).toBeChecked();
+});
+
+test("an empty share link restores an empty box and no layers", () => {
+  history.replaceState(null, "", "/#chaos=0.35&layers=&text=");
+  render(App);
+  expect(screen.getByLabelText("Original")).toHaveValue("");
+  for (const box of screen.getAllByRole("checkbox")) expect(box).not.toBeChecked();
+  expect(
+    screen.getByText("Enable at least one layer to crabtreeify the text."),
+  ).toBeInTheDocument();
+});
+
+test("shared text with every layer off stays that way", () => {
+  history.replaceState(null, "", "/#chaos=0.35&layers=&text=Hello");
+  render(App);
+  expect(screen.getByLabelText("Original")).toHaveValue("Hello");
+  for (const box of screen.getAllByRole("checkbox")) expect(box).not.toBeChecked();
+  expect(document.querySelector(".output")).toHaveTextContent("Hello");
+});
+
+test("sharing a cleared box round-trips the empty state", async () => {
+  const view = render(App);
+  await user.clear(screen.getByLabelText("Original"));
+  for (const box of screen.getAllByRole("checkbox")) await user.click(box);
+  await user.click(screen.getByRole("button", { name: "Share" }));
+  view.unmount();
+  render(App);
+  expect(screen.getByLabelText("Original")).toHaveValue("");
+  for (const box of screen.getAllByRole("checkbox")) expect(box).not.toBeChecked();
+});

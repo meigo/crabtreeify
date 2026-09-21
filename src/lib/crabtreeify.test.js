@@ -412,3 +412,122 @@ test("a phrase from a later layer beats a single-word swap from an earlier one",
   assert.equal(withSilly("I hit the ball."), "I hot the ball.");
   assert.equal(withSilly("A direct hit."), "A direct hot.");
 });
+
+test("consonant-y inflections follow the base rule", () => {
+  assert.equal(convert("worried", 0, ["canonical"]), "wearied");
+  assert.equal(convert("copied", 0, ["canonical"]), "kippied");
+  assert.equal(convert("partied", 0, ["canonical"]), "pottied");
+  assert.equal(convert("studied", 0.15, ["silly"]), "sturdied");
+  assert.equal(convert("pitied", 0.15, ["silly"]), "pottied");
+  assert.equal(convert("fancied", 0.15, ["silly"]), "fannied");
+  assert.equal(convert("emptied", 0.45, ["silly"]), "numptied");
+  assert.equal(convert("happily", 0.45, ["silly"]), "nappily");
+  assert.equal(convert("happier", 0.45, ["silly"]), "nappier");
+  assert.equal(convert("happiest", 0.45, ["silly"]), "nappiest");
+  // The vowel layer must not get a second pass at a word the stem already owns.
+  assert.equal(convert("worried", 1, ["canonical", "vowels"]), "wearied");
+});
+
+test("a listed inflected form still beats the restored stem", () => {
+  assert.equal(convert("tied", 0.45, ["silly"]), "tit");
+});
+
+test("consonant-y plurals still follow the stem", () => {
+  assert.equal(convert("worries", 0, ["canonical"]), "wearies");
+  assert.equal(convert("copies", 0, ["canonical"]), "kippies");
+});
+
+test("a shorter phrase is one highlighted span, not a blank word", () => {
+  const { text, parts, changeCount } = crabtreeifyDetailed("I ran away.", layers, {
+    intensity: 0.15,
+    enabledLayers: ["weird"],
+  });
+  assert.equal(text, "I skedaddled.");
+  assert.equal(changeCount, 1);
+  assert.deepEqual(
+    parts.filter((part) => part.changed),
+    [{ text: "skedaddled", changed: true, from: "ran away" }],
+  );
+  assert.ok(parts.every((part) => part.text !== ""));
+});
+
+test("an unequal phrase attributes the whole span", () => {
+  const { text, parts } = crabtreeifyDetailed("long distance duck", layers, {
+    intensity: 0,
+    enabledLayers: ["canonical"],
+  });
+  assert.equal(text, "lung-dostance dick");
+  assert.deepEqual(
+    parts.filter((part) => part.changed),
+    [{ text: "lung-dostance dick", changed: true, from: "long distance duck" }],
+  );
+});
+
+test("a longer phrase is one span, not a word-by-word zip", () => {
+  const layer = {
+    meta: { name: "growing", label: "Growing" },
+    phrases: [{ from: "alpha beta", to: "one two three" }],
+  };
+  const { text, parts, changeCount } = crabtreeifyDetailed("Alpha beta.", [layer], {
+    intensity: 1,
+    enabledLayers: ["growing"],
+  });
+  assert.equal(text, "One two three.");
+  assert.equal(changeCount, 1);
+  assert.deepEqual(
+    parts.filter((part) => part.changed),
+    [{ text: "One two three", changed: true, from: "Alpha beta" }],
+  );
+});
+
+test("newer silly sound-alikes stay in their chaos band", () => {
+  assert.equal(
+    convert("The lion left his boots by the grove.", 0.15, ["silly"]),
+    "The loin left his boobs by the grope.",
+  );
+  assert.equal(convert("Take a seat.", 0.35, ["silly"]), "Take a seat.");
+  assert.equal(convert("Take a seat.", 0.5, ["silly"]), "Take a shat.");
+  assert.equal(convert("One cent.", 0.5, ["silly"]), "One cent.");
+  assert.equal(convert("One cent.", 1, ["silly"]), "One cunt.");
+});
+
+test("common words land on a rude punchline instead of a vowel typo", () => {
+  assert.equal(convert("She tried to kiss him.", 0.35), "She tried to piss him.");
+  assert.equal(convert("The striker missed the goal.", 0.35), "The striker pissed the hole.");
+  assert.equal(
+    convert("She said the doctor should exercise.", 0.35),
+    "She sod the dicktor should exorcise.",
+  );
+  assert.equal(convert("He threw his beer.", 0.35, ["silly"]), "He threw his bugger.");
+  assert.equal(convert("I am tired.", 0.35, ["silly"]), "I am turd.");
+});
+
+test("names and blunt words are not spared", () => {
+  assert.equal(convert("Doug and Burt.", 0.15, ["silly"]), "Dong and Butt.");
+  assert.equal(convert("Wong met a Scot.", 0.15, ["silly"]), "Wang met a Snot.");
+  assert.equal(
+    convert("The cheater was exhausted.", 0.15, ["weird"]),
+    "The bedswerver was knackered.",
+  );
+  assert.equal(convert("He is fat.", 0.5, ["weird"]), "He is blubber.");
+});
+
+test("newer weird synonyms swap plain words for funny ones", () => {
+  assert.equal(
+    convert("The cat in the kitchen ate delicious food in the garden.", 0.15, ["weird"]),
+    "The moggie in the scullery ate scrumptious victuals in the allotment.",
+  );
+  assert.equal(convert("That thing.", 0.15, ["weird"]), "That thingamajig.");
+  assert.equal(convert("That thing.", 0.5, ["silly", "weird"]), "That thong.");
+  assert.equal(convert("What a lot.", 0.15, ["weird"]), "What a lot.");
+  assert.equal(convert("What a lot.", 0.5, ["weird"]), "What oodles.");
+});
+
+test("an equal-length phrase still attributes each word", () => {
+  const { parts } = crabtreeifyDetailed("do not worry", layers, {
+    intensity: 0,
+    enabledLayers: ["canonical"],
+  });
+  const weary = parts.find((part) => part.text.toLowerCase() === "weary");
+  assert.equal(weary?.from.toLowerCase(), "worry");
+});

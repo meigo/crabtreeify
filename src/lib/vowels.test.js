@@ -148,6 +148,22 @@ test("still collapses a final -er into -a like the show's wata", () => {
   assert.equal(vowelSwap("other"), "otha");
 });
 
+test("leaves glue-word contractions alone", () => {
+  // "dan't" and "ot's" read as typos. A curly apostrophe has to stay put too.
+  // prettier-ignore
+  const words = [
+    "don't", "don't".replace("'", "\u2019"),
+    "it's", "we're", "they've", "she's", "we've", "he'd",
+    "can't", "won't", "didn't", "let's", "I'm",
+  ];
+  for (const word of words) assert.equal(vowelSwap(word), null, word);
+});
+
+test("still mangles a content word that only contains an apostrophe", () => {
+  assert.equal(vowelSwap("ma'am"), "mo'am");
+  assert.equal(vowelSwap("rock'n'roll"), "rack'n'roll");
+});
+
 test("leaves pronoun-like glue words alone", () => {
   // "evirybody", "huwever" and "thamselves" read as typos, not an accent.
   // prettier-ignore

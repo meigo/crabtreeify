@@ -23,9 +23,11 @@
     { label: "Bonkers", value: 1 },
   ];
 
-  let input = $state(params.get("text") || sampleText);
+  let input = $state(params.has("text") ? params.get("text") : sampleText);
   let intensity = $state(normalizeIntensity(params.get("chaos"), 0.35));
-  const enabledLayers = $state(parseLayersParam(params.get("layers")));
+  const enabledLayers = $state(
+    parseLayersParam(params.has("layers") ? params.get("layers") : null),
+  );
   let copied = $state(false);
   let shared = $state(false);
   let status = $state("");
@@ -54,7 +56,9 @@
   let shareTooLong = $derived(input.length > SHARE_TEXT_LIMIT);
 
   function parseLayersParam(value) {
-    if (!value) return Object.fromEntries(layerList.map((l) => [l.name, true]));
+    // A missing key means "all layers". A present empty value means none:
+    // `layers=` is what Share writes when every box is unchecked.
+    if (value == null) return Object.fromEntries(layerList.map((l) => [l.name, true]));
     const set = new Set(value.split(",").filter(Boolean));
     return Object.fromEntries(layerList.map((l) => [l.name, set.has(l.name)]));
   }

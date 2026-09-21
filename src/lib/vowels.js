@@ -151,6 +151,24 @@ function touchesEdgeVowel(word, candidate, groups, rhotic, stressed) {
   return unstressed && rhotic !== "a" && changedAt >= last.index;
 }
 
+const CONTRACTION_SUFFIX = new Set(["s", "re", "ve", "ll", "d", "t", "m"]);
+
+function isGlueContraction(word) {
+  const lower = word.toLowerCase().replace(/[’‘]/g, "'");
+  // don't / isn't keep the base; can't, won't, and shan't spell it differently.
+  const not = lower.match(/^([a-z]+)n't$/);
+  if (not) {
+    const stem = not[1];
+    return STOPWORDS.has(stem) || stem === "ca" || stem === "wo" || stem === "sha";
+  }
+  const parts = lower.split("'");
+  if (parts.length !== 2) return false;
+  const [base, suffix] = parts;
+  if (!CONTRACTION_SUFFIX.has(suffix)) return false;
+  // "let's" is glue even though "let" itself is not a stopword.
+  return STOPWORDS.has(base) || (base === "let" && suffix === "s");
+}
+
 /**
  * @returns {string|null} the mangled word, or null if it should be left alone
  */
@@ -162,7 +180,7 @@ export function vowelSwap(word) {
   if (word.length <= 4 && word === word.toUpperCase()) return null;
 
   const lower = word.toLowerCase();
-  if (STOPWORDS.has(lower)) return null;
+  if (STOPWORDS.has(lower) || isGlueContraction(lower)) return null;
   if (!HAS_VOWEL.test(lower)) return null;
 
   // Mangling a short word looks like a typo ("out" -> "ot") unless the
