@@ -44,6 +44,11 @@ test("restores chaos from a share link", () => {
   expect(screen.getByLabelText("Chaos").value).toBe("0.8");
 });
 
+test("offers a harmless sound-alike layer", () => {
+  render(App);
+  expect(screen.getByRole("checkbox", { name: /Sound-alikes/ })).toBeChecked();
+});
+
 test("starts at the default chaos when the link has none", () => {
   render(App);
   expect(screen.getByLabelText("Chaos").value).toBe("0.35");

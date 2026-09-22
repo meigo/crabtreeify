@@ -502,6 +502,18 @@ test("common words land on a rude punchline instead of a vowel typo", () => {
   assert.equal(convert("I am tired.", 0.35, ["silly"]), "I am turd.");
 });
 
+test("harmless sound-alikes swap a word for one that sounds like it", () => {
+  const run = (text) => convert(text, 0.35, ["sounds"]);
+  assert.equal(run("The weather was intense."), "The whether was intents.");
+  assert.equal(run("Accept the compliment."), "Except the complement.");
+  assert.equal(run("for all intensive purposes"), "for all intents and purposes");
+});
+
+test("a rude swap still beats a harmless sound-alike", () => {
+  assert.equal(convert("break", 1, ["silly", "sounds"]), "prick");
+  assert.equal(convert("brake", 0.35, ["silly", "sounds"]), "break");
+});
+
 test("names and blunt words are not spared", () => {
   assert.equal(convert("Doug and Burt.", 0.15, ["silly"]), "Dong and Butt.");
   assert.equal(convert("Wong met a Scot.", 0.15, ["silly"]), "Wang met a Snot.");
